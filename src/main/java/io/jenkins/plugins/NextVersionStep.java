@@ -5,17 +5,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.TaskListener;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.LogCommand;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.jenkinsci.plugins.gitclient.JGitAPIImpl;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
@@ -23,6 +15,7 @@ import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import com.github.zafarkhaja.semver.Version;
 
 public class NextVersionStep extends Step {
 
@@ -60,48 +53,30 @@ public class NextVersionStep extends Step {
             // FIXME this needs correctly implementing
             // getContext().get(FilePath.class).
 
-            // TODO get the nearest tag
-            FileRepositoryBuilder builder = new FileRepositoryBuilder();
-            Repository repository = builder
-                    .readEnvironment() // scan environment GIT_* variables
-                    .findGitDir() // scan up the file system tree
-                    .build();
+            Gitter git = new GitterImpl();
 
-            try (Git git = new Git(repository)) {
-                List<Ref> call = git.tagList().call();
-                for (Ref ref : call) {
-                    getContext().get(TaskListener.class).getLogger().println("Tag: " + ref + " " + ref.getName() + " " + ref.getObjectId().getName());
-
-                    // fetch all commits for this tag
-                    LogCommand log = git.log();
-
-                    Iterable<RevCommit> logs = log.call();
-                    for (RevCommit rev : logs) {
-                        getContext().get(TaskListener.class).getLogger().println("Commit: " + rev /* + ", name: " + rev.getName() + ", id: " + rev.getId().getName() */);
-                        getContext().get(TaskListener.class).getLogger().println("Full Message: " + rev.getFullMessage());
-                    }
-                }
+            List<String> tags = git.tags();
+            for (String tag : tags) {
+                getContext().get(TaskListener.class).getLogger().println("Tag: " + tag);
             }
 
-
-            getContext().get(TaskListener.class).getLogger().println(repository);
-
-            //List<Ref> call = repository..tagList().call();
-            //for (Ref ref : call) {
-            //    getContext().get(TaskListener.class).getLogger().println(ref);
-            //}
-
-
             // TODO get a list of commits between 'this' and the tag
+            List<String> commits = git.commits();
+            for (String commit: commits) {
+                getContext().get(TaskListener.class).getLogger().println("Commit: " + commit);
+            }
 
-            // TODO based on the commit list, determine how to bump the version
+            Version currentVersion = Version.valueOf("0.0.1");
+
+            // based on the commit list, determine how to bump the version
+            Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commits);
+
 
             // TODO write the version using the output template
 
-            String nextVersion = "0.0.1";
             getContext().get(TaskListener.class).getLogger().println(nextVersion);
 
-            return nextVersion;
+            return nextVersion.toString();
         }
 
     }
