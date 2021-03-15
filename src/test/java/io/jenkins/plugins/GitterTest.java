@@ -4,6 +4,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GitterTest {
@@ -20,7 +21,6 @@ public class GitterTest {
         assertThat(latestTag, is("1.0.0"));
 
         latestTag = gitter.latestTag(Arrays.asList());
-        assertThat(latestTag, is(notNullValue()));
-        assertThat(latestTag, is("0.0.0"));
+        assertThat(latestTag, is(nullValue()));
     }
 }

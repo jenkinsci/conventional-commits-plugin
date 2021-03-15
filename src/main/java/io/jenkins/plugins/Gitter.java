@@ -18,7 +18,8 @@ public interface Gitter {
 
     /**
      * Lists all commits on a repository
+     * @param startTag the tag to start from, or null
      * @return a list of all commits on a repository
      */
-    List<String> commits();
+    List<String> commits(String startTag);
 }

@@ -8,6 +8,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -42,7 +43,7 @@ public class GitterImpl implements Gitter {
 
     @Override
     public String latestTag() {
-        return latestTag(commits());
+        return latestTag(tags());
     }
 
     public String latestTag(List<String> in) {
@@ -54,14 +55,14 @@ public class GitterImpl implements Gitter {
 
         // this is our starting version if there are no tags
         if (tags.isEmpty()) {
-            return "0.0.0";
+            return null;
         }
 
         return tags.get(0).toString();
     }
 
     @Override
-    public List<String> commits() {
+    public List<String> commits(String startTag) {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         List<String> commits = new ArrayList<>();
 
@@ -74,6 +75,13 @@ public class GitterImpl implements Gitter {
             Git git = new Git(repository);
             // fetch all commits for this tag
             LogCommand log = git.log();
+
+            if (startTag != null) {
+                ObjectId from = repository.resolve("refs/tags/" + startTag);
+                ObjectId to = repository.resolve("refs/for/main");
+
+                log.addRange(from, to);
+            }
 
             Iterable<RevCommit> logs = log.call();
             for (RevCommit rev : logs) {

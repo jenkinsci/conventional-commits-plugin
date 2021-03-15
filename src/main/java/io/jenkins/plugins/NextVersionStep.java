@@ -55,18 +55,16 @@ public class NextVersionStep extends Step {
 
             Gitter git = new GitterImpl();
 
-            List<String> tags = git.tags();
-            for (String tag : tags) {
-                getContext().get(TaskListener.class).getLogger().println("Tag: " + tag);
-            }
+            String latestTag = git.latestTag();
+            getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
 
             // TODO get a list of commits between 'this' and the tag
-            List<String> commits = git.commits();
+            List<String> commits = git.commits(latestTag);
             for (String commit: commits) {
                 getContext().get(TaskListener.class).getLogger().println("Commit: " + commit);
             }
 
-            Version currentVersion = Version.valueOf(git.latestTag());
+            Version currentVersion = Version.valueOf(latestTag);
 
             // based on the commit list, determine how to bump the version
             Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commits);
