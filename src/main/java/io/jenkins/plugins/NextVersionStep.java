@@ -66,11 +66,10 @@ public class NextVersionStep extends Step {
                 getContext().get(TaskListener.class).getLogger().println("Commit: " + commit);
             }
 
-            Version currentVersion = Version.valueOf("0.0.1");
+            Version currentVersion = Version.valueOf(git.latestTag());
 
             // based on the commit list, determine how to bump the version
             Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commits);
-
 
             // TODO write the version using the output template
 

@@ -1,8 +1,11 @@
 package io.jenkins.plugins;
 
+import com.github.zafarkhaja.semver.Version;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.lib.Ref;
@@ -39,7 +42,22 @@ public class GitterImpl implements Gitter {
 
     @Override
     public String latestTag() {
-        return null;
+        return latestTag(commits());
+    }
+
+    public String latestTag(List<String> in) {
+        List<Version> tags = in.stream()
+                .map(v -> Version.valueOf(v))
+                .collect(Collectors.toList());
+
+        tags.sort(Comparator.reverseOrder());
+
+        // this is our starting version if there are no tags
+        if (tags.isEmpty()) {
+            return "0.0.0";
+        }
+
+        return tags.get(0).toString();
     }
 
     @Override
