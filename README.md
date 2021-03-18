@@ -8,19 +8,36 @@
 
 ## Introduction
 
-TODO Describe what your plugin does here
+This plugin can be used to determine the next release version based on previous tags and the commit messages used.  It calculates the version number based on the
+format of the commit message.  The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Getting started
 
-TODO Tell users how to configure your plugin here, include screenshots, pipeline examples and 
-configuration-as-code examples.
+This plugin can be used in a pipeline in a stage or the environment block.  Some examples of this in use are:
+
+### In the environment block
+
+```
+pipeline {
+    agent any
+
+    environment {
+        NEXT_VERSION = nextVersion()
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+```
 
 ## Issues
 
-TODO Decide where you're going to host your issues, the default is Jenkins JIRA, but you can also enable GitHub issues,
-If you use GitHub issues there's no need for this section; else add the following line:
-
-Report issues and enhancements in the [Jenkins issue tracker](https://issues.jenkins-ci.org/).
+Report issues and enhancements in the [Github issue tracker](https://github.com/jenkinsci/conventional-commits/issues).
 
 ## Contributing
 
