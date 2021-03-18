@@ -19,8 +19,6 @@ public class GitterImpl implements Gitter {
     @Override
     public List<String> tags() {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        List<String> tags = new ArrayList<>();
-
         try {
             Repository repository = builder
                 .readEnvironment()
@@ -30,15 +28,14 @@ public class GitterImpl implements Gitter {
             Git git = new Git(repository);
             List<Ref> call = git.tagList().call();
 
-            // TODO use stream processing here
-            for (Ref ref : call) {
-                tags.add(ref.getName().replace("refs/tags/", ""));
-            }
+            return call
+                    .stream()
+                    .map(ref -> ref.getName().replace("refs/tags/", ""))
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             // FIXME
             throw new IllegalStateException(e);
         }
-        return tags;
     }
 
     @Override
@@ -47,8 +44,8 @@ public class GitterImpl implements Gitter {
     }
 
     public String latestTag(List<String> in) {
-        System.out.println(in);
-        List<Version> tags = in.stream()
+        List<Version> tags = in
+                .stream()
                 .map(v -> Version.valueOf(v))
                 .collect(Collectors.toList());
 
@@ -85,10 +82,7 @@ public class GitterImpl implements Gitter {
                 log.addRange(from, to);
             }
 
-            Iterable<RevCommit> logs = log.call();
-            for (RevCommit rev : logs) {
-                commits.add(rev.getFullMessage());
-            }
+            log.call().forEach(revCommit -> commits.add(revCommit.getFullMessage()));
         } catch (Exception e) {
             // FIXME
             throw new IllegalStateException(e);

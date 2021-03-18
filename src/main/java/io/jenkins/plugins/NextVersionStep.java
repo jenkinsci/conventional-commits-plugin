@@ -63,9 +63,6 @@ public class NextVersionStep extends Step {
 
         @Override
         protected String run() throws Exception {
-            // FIXME this needs correctly implementing
-            // getContext().get(FilePath.class).
-
             Gitter git = new GitterImpl();
 
             String latestTag = null;
