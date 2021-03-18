@@ -32,7 +32,7 @@ public class GitterImpl implements Gitter {
 
             // TODO use stream processing here
             for (Ref ref : call) {
-                tags.add(ref.getName());
+                tags.add(ref.getName().replace("refs/tags/", ""));
             }
         } catch (Exception e) {
             // FIXME
@@ -47,6 +47,7 @@ public class GitterImpl implements Gitter {
     }
 
     public String latestTag(List<String> in) {
+        System.out.println(in);
         List<Version> tags = in.stream()
                 .map(v -> Version.valueOf(v))
                 .collect(Collectors.toList());
@@ -78,7 +79,8 @@ public class GitterImpl implements Gitter {
 
             if (startTag != null) {
                 ObjectId from = repository.resolve("refs/tags/" + startTag);
-                ObjectId to = repository.resolve("refs/for/main");
+                // TODO is this correct?
+                ObjectId to = repository.resolve(repository.getFullBranch());
 
                 log.addRange(from, to);
             }

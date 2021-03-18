@@ -8,6 +8,7 @@ import hudson.model.TaskListener;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
@@ -20,6 +21,7 @@ import com.github.zafarkhaja.semver.Version;
 public class NextVersionStep extends Step {
 
     private String outputFormat;
+    private String startTag;
 
     @DataBoundConstructor
     public NextVersionStep() {
@@ -31,9 +33,16 @@ public class NextVersionStep extends Step {
         this.outputFormat = outputFormat;
     }
 
+    @DataBoundSetter
+    public void setStartTag(String startTag) {
+        this.startTag = startTag;
+    }
+
     @Override
     public StepExecution start(StepContext stepContext) throws Exception {
-        return new Execution(outputFormat, stepContext);
+        return new Execution(outputFormat,
+                startTag,
+                stepContext);
     }
 
     public static class Execution extends SynchronousStepExecution<String> {
@@ -43,9 +52,13 @@ public class NextVersionStep extends Step {
         @SuppressFBWarnings(value="SE_TRANSIENT_FIELD_NOT_RESTORED", justification="Only used when starting.")
         private transient final String outputFormat;
 
-        protected Execution(String outputFormat, @Nonnull StepContext context) {
+        @SuppressFBWarnings(value="SE_TRANSIENT_FIELD_NOT_RESTORED", justification="Only used when starting.")
+        private transient final String startTag;
+
+        protected Execution(String outputFormat, String startTag, @Nonnull StepContext context) {
             super(context);
             this.outputFormat = outputFormat;
+            this.startTag = startTag;
         }
 
         @Override
@@ -55,7 +68,13 @@ public class NextVersionStep extends Step {
 
             Gitter git = new GitterImpl();
 
-            String latestTag = git.latestTag();
+            String latestTag = null;
+            if (StringUtils.isNotEmpty(startTag)) {
+                latestTag = startTag;
+            } else {
+                latestTag = git.latestTag();
+            }
+
             getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
 
             // TODO get a list of commits between 'this' and the tag
@@ -64,7 +83,10 @@ public class NextVersionStep extends Step {
                 getContext().get(TaskListener.class).getLogger().println("Commit: " + commit);
             }
 
-            Version currentVersion = Version.valueOf(latestTag);
+            if (latestTag == null) {
+                getContext().get(TaskListener.class).getLogger().println("Setting current version to 0.0.0 as this appears to be the first release");
+            }
+            Version currentVersion = Version.valueOf(latestTag == null ? "0.0.0" : latestTag);
 
             // based on the commit list, determine how to bump the version
             Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commits);

@@ -4,4 +4,7 @@
     <f:entry field="outputFormat" title="${%OutputFormat}">
         <f:textbox/>
     </f:entry>
+    <f:entry field="startTag" title="${%StartTag}">
+            <f:textbox/>
+        </f:entry>
 </j:jelly>
