@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.conventionalcommits;
 
 import java.util.List;
 
