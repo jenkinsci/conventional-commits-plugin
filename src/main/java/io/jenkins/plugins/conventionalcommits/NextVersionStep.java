@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.conventionalcommits;
 
 import com.google.common.collect.ImmutableSet;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

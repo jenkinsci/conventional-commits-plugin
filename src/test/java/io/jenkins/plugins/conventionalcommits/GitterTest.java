@@ -1,5 +1,6 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.conventionalcommits;
 
+import io.jenkins.plugins.conventionalcommits.GitterImpl;
 import java.util.Arrays;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;

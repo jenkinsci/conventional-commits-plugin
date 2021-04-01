@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.conventionalcommits;
 
 import hudson.model.Result;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;

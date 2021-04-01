@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.conventionalcommits;
 
 import com.github.zafarkhaja.semver.Version;
 import java.util.List;

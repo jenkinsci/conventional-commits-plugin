@@ -1,6 +1,7 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.conventionalcommits;
 
 import com.github.zafarkhaja.semver.Version;
+import io.jenkins.plugins.conventionalcommits.ConventionalCommits;
 import java.util.Arrays;
 import org.junit.Test;
 
