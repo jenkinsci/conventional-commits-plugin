@@ -97,14 +97,13 @@ public class NextVersionStep extends Step {
                 String latestTag = "";
                 try {
                     latestTag = execute(dir,"git", "describe", "--abbrev=0", "--tags").trim();
+                    getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
                 } catch (IOException exp) {
                     if (exp.getMessage().contains("No names found, cannot describe anything.")) {
                         getContext().get(TaskListener.class).getLogger().println("No tags found");
                         latestTag = "0.0.0";
                     }
                 }
-            
-                getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
 
                 Version currentVersion = Version.valueOf(latestTag);
 

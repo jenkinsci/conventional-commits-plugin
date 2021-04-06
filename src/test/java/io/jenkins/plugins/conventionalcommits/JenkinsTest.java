@@ -19,9 +19,9 @@ public class JenkinsTest {
     public JenkinsRule rule = new JenkinsRule();
 
     @Test
-    public void testPipelineCompatibility() throws Exception {
+    public void testPipelineWithNoTags() throws Exception {
         WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
-        URL zipFile = getClass().getResource("files-and-folders.zip");
+        URL zipFile = getClass().getResource("simple-project-with-notags.zip");
         assertThat(zipFile, is(notNullValue()));
 
         p.setDefinition(new CpsFlowDefinition("node {\n"
@@ -36,8 +36,29 @@ public class JenkinsTest {
         assertThat(rule.getLog(b), containsString("Started"));
         assertThat(rule.getLog(b), containsString("nextVersion"));
         assertThat(rule.getLog(b), containsString("No tags found"));
-        assertThat(rule.getLog(b), containsString("Current Tag is: 0.0.0"));
         assertThat(rule.getLog(b), containsString("0.0.1"));
+        assertThat(rule.getLog(b), containsString("Finished: SUCCESS"));
+    }
+
+    @Test
+    public void testPipelineWithTags() throws Exception {
+        WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
+        URL zipFile = getClass().getResource("simple-project-with-tags.zip");
+        assertThat(zipFile, is(notNullValue()));
+
+        p.setDefinition(new CpsFlowDefinition("node {\n"
+                                              + "  unzip '" + zipFile.getPath() + "'\n"
+                                              + "  nextVersion()\n"
+                                              + "}\n", true));
+
+        WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+
+        System.out.println(rule.getLog(b));
+
+        assertThat(rule.getLog(b), containsString("Started"));
+        assertThat(rule.getLog(b), containsString("nextVersion"));
+        assertThat(rule.getLog(b), containsString("Current Tag is: 0.1.0"));
+        assertThat(rule.getLog(b), containsString("0.1.1"));
         assertThat(rule.getLog(b), containsString("Finished: SUCCESS"));
     }
 
