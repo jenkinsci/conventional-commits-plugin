@@ -117,9 +117,9 @@ public class NextVersionStep extends Step {
 
                 // TODO write the version using the output template
                 getContext().get(TaskListener.class).getLogger().println(nextVersion);
-            }
 
-            return null;
+                return nextVersion.toString();
+            }
         }
     }
 
