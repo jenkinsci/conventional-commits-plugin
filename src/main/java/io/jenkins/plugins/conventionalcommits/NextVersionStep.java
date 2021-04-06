@@ -84,16 +84,11 @@ public class NextVersionStep extends Step {
                 throw new IOException("no workspace");
             }
 
-            getContext().get(TaskListener.class).getLogger().println("workspace: " + workspace);
-            getContext().get(TaskListener.class).getLogger().println("workspace.isRemote(): " + workspace.isRemote());
-
             // if the workspace is remote then lets make a local copy
             if (workspace.isRemote()) {
                 throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
             } else {
                 File dir = new File(workspace.getRemote());
-                getContext().get(TaskListener.class).getLogger().println("dir: " + dir);
-
                 // git describe --abbrev=0 --tags
                 String latestTag = "";
                 try {
@@ -102,15 +97,19 @@ public class NextVersionStep extends Step {
                 } catch (IOException exp) {
                     if (exp.getMessage().contains("No names found, cannot describe anything.")) {
                         getContext().get(TaskListener.class).getLogger().println("No tags found");
-                        latestTag = "0.0.0";
                     }
                 }
 
-                Version currentVersion = Version.valueOf(latestTag);
+                Version currentVersion = Version.valueOf(latestTag.isEmpty() ? "0.0.0" : latestTag);
+                String commitMessagesString = null;
+                if (latestTag.isEmpty()) {
+                    commitMessagesString = execute(dir,"git", "log", "--pretty=format:%s").trim();
+                } else {
+                    // FIXME get a list of commits between 'this' and the tag
+                    // git log --pretty=format:%s tag..HEAD
+                    commitMessagesString = execute(dir,"git", "log", "--pretty=format:%s", latestTag + "..HEAD").trim();
+                }
 
-                // git log --pretty=format:%s
-                // FIXME get a list of commits between 'this' and the tag
-                String commitMessagesString = execute(dir,"git", "log", "--pretty=format:%s").trim();
                 List<String> commitHistory = Arrays.asList(commitMessagesString.split("\n"));
 
                 // based on the commit list, determine how to bump the version

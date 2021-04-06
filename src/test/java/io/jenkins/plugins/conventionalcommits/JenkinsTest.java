@@ -58,7 +58,7 @@ public class JenkinsTest {
         assertThat(rule.getLog(b), containsString("Started"));
         assertThat(rule.getLog(b), containsString("nextVersion"));
         assertThat(rule.getLog(b), containsString("Current Tag is: 0.1.0"));
-        assertThat(rule.getLog(b), containsString("0.2.0"));
+        assertThat(rule.getLog(b), containsString("0.1.1"));
         assertThat(rule.getLog(b), containsString("Finished: SUCCESS"));
     }
 }
