@@ -79,8 +79,20 @@ public class NextVersionStep extends Step {
         @Override
         protected String run() throws Exception {
             FilePath workspace = getContext().get(FilePath.class);
+            if (workspace == null) {
+                throw new IOException("no workspace");
+            }
+
             getContext().get(TaskListener.class).getLogger().println("workspace: " + workspace);
             getContext().get(TaskListener.class).getLogger().println("workspace.isRemote(): " + workspace.isRemote());
+
+            // if the workspace is remote then lets make a local copy
+            if (workspace.isRemote()) {
+                throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
+            } else {
+                File dir = new File(workspace.getRemote());
+                getContext().get(TaskListener.class).getLogger().println("dir: " + dir);
+            }
 
             // git describe --abbrev=0 --tags
             String latestTag = "";
