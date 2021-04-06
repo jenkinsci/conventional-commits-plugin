@@ -78,7 +78,6 @@ public class NextVersionStep extends Step {
 
         @Override
         protected String run() throws Exception {
-
             // git describe --abbrev=0 --tags
             String latestTag = execute("git", "describe", "--abbrev=0", "--tags").trim();
             getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
@@ -122,7 +121,8 @@ public class NextVersionStep extends Step {
         Process process = builder.start();
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new IOException("process failed " + exitCode);
+            String stderr = stdout(process.getErrorStream());
+            throw new IOException("executing '" + String.join(" ", commandAndArgs) + "' failed with exit code" + exitCode + " and error " + stderr);
         }
         return stdout(process.getInputStream());
     }
