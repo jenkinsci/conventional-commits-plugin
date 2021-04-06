@@ -78,6 +78,10 @@ public class NextVersionStep extends Step {
 
         @Override
         protected String run() throws Exception {
+            FilePath workspace = getContext().get(FilePath.class);
+            getContext().get(TaskListener.class).getLogger().println("workspace: " + workspace);
+            getContext().get(TaskListener.class).getLogger().println("workspace.isRemote(): " + workspace.isRemote());
+
             // git describe --abbrev=0 --tags
             String latestTag = "";
             try {
