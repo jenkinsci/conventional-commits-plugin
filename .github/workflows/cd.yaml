@@ -28,6 +28,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Jenkins
 
+      - name: next release version
+        id: nextversion
+        uses: jenkins-x-plugins/jx-release-version@v2.2.6
+
+      - name: Set Version
+        run: |
+          mvn versions:set-version -DnewVersion=${{ steps.nextversion.outputs.version }}
+
       - name: Release Drafter
         uses: release-drafter/release-drafter@v5.14.0
         if: steps.wait-for-build.outputs.conclusion == 'success'
@@ -61,10 +69,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Release
-        uses: jenkins-infra/jenkins-maven-cd-action@master
-        if: steps.interesting.outputs.should_release == 'true'
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
+            #      - name: Release
+            #        uses: jenkins-infra/jenkins-maven-cd-action@master
+            #        if: steps.interesting.outputs.should_release == 'true'
+            #        with:
+            #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            #          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+            #          MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
