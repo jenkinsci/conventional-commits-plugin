@@ -1,6 +1,6 @@
 # conventional-commits-plugin
 
-[![Build Status](https://ci.jenkins.io/job/Plugins/job/conventional-commits-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/conventional-commits-plugin/job/master/)
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/conventional-commits-plugin/job/main/badge/icon)](https://ci.jenkins.io/job/Plugins/job/conventional-commits-plugin/job/main/)
 [![Contributors](https://img.shields.io/github/contributors/jenkinsci/conventional-commits-plugin.svg)](https://github.com/jenkinsci/conventional-commits-plugin/graphs/contributors)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/conventional-commits-plugin.svg)](https://plugins.jenkins.io/conventional-commits-plugin)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/conventional-commits-plugin.svg?label=changelog)](https://github.com/jenkinsci/conventional-commits-plugin/releases/latest)
