@@ -79,14 +79,25 @@ public class NextVersionStep extends Step {
         @Override
         protected String run() throws Exception {
             // git describe --abbrev=0 --tags
-            String latestTag = execute("git", "describe", "--abbrev=0", "--tags").trim();
+            String latestTag = "";
+            try {
+                latestTag = execute("git", "describe", "--abbrev=0", "--tags").trim();
+            } catch (IOException exp) {
+                if (exp.getMessage().contains("No names found, cannot describe anything.")) {
+                    getContext().get(TaskListener.class).getLogger().println("No tags found");
+                    latestTag = "0.0.0";
+                }
+            }
+            
             getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
 
+            Version currentVersion = Version.valueOf(latestTag);
+
             // TODO get a list of commits between 'this' and the tag
-            Version currentVersion = Version.valueOf(latestTag.isEmpty() ? "0.0.0" : latestTag);
+            List<String> commitHistory = Collections.singletonList("chore: do something");
 
             // based on the commit list, determine how to bump the version
-            Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, Collections.singletonList("chore: do something"));
+            Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
 
             // TODO write the version using the output template
             getContext().get(TaskListener.class).getLogger().println(nextVersion);
