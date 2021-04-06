@@ -92,31 +92,35 @@ public class NextVersionStep extends Step {
             } else {
                 File dir = new File(workspace.getRemote());
                 getContext().get(TaskListener.class).getLogger().println("dir: " + dir);
-            }
 
-            // git describe --abbrev=0 --tags
-            String latestTag = "";
-            try {
-                latestTag = execute("git", "describe", "--abbrev=0", "--tags").trim();
-            } catch (IOException exp) {
-                if (exp.getMessage().contains("No names found, cannot describe anything.")) {
-                    getContext().get(TaskListener.class).getLogger().println("No tags found");
-                    latestTag = "0.0.0";
+                // git describe --abbrev=0 --tags
+                String latestTag = "";
+                try {
+                    latestTag = execute(dir,"git", "describe", "--abbrev=0", "--tags").trim();
+                } catch (IOException exp) {
+                    if (exp.getMessage().contains("No names found, cannot describe anything.")) {
+                        getContext().get(TaskListener.class).getLogger().println("No tags found");
+                        latestTag = "0.0.0";
+                    }
                 }
-            }
             
-            getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
+                getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
 
-            Version currentVersion = Version.valueOf(latestTag);
+                Version currentVersion = Version.valueOf(latestTag);
 
-            // TODO get a list of commits between 'this' and the tag
-            List<String> commitHistory = Collections.singletonList("chore: do something");
+                // git log --pretty=format:'%h : %s'
+                String commitMessages = execute(dir,"git", "log", "--pretty=format:'%s'").trim();
+                getContext().get(TaskListener.class).getLogger().println("Commits>\n" + commitMessages);
 
-            // based on the commit list, determine how to bump the version
-            Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+                // TODO get a list of commits between 'this' and the tag
+                List<String> commitHistory = Collections.singletonList("chore: do something");
 
-            // TODO write the version using the output template
-            getContext().get(TaskListener.class).getLogger().println(nextVersion);
+                // based on the commit list, determine how to bump the version
+                Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+
+                // TODO write the version using the output template
+                getContext().get(TaskListener.class).getLogger().println(nextVersion);
+            }
 
             return null;
         }
@@ -141,15 +145,16 @@ public class NextVersionStep extends Step {
         }
     }
 
-    private static String execute(String... commandAndArgs) throws IOException, InterruptedException {
+    private static String execute(File dir, String... commandAndArgs) throws IOException, InterruptedException {
         ProcessBuilder builder = new ProcessBuilder()
+                .directory(dir)
                 .command(commandAndArgs);
 
         Process process = builder.start();
         int exitCode = process.waitFor();
         if (exitCode != 0) {
             String stderr = stdout(process.getErrorStream());
-            throw new IOException("executing '" + String.join(" ", commandAndArgs) + "' failed with exit code" + exitCode + " and error " + stderr);
+            throw new IOException("executing '" + String.join(" ", commandAndArgs) + "' failed in '" + dir + "' with exit code" + exitCode + " and error " + stderr);
         }
         return stdout(process.getInputStream());
     }
