@@ -1,13 +1,26 @@
 package io.jenkins.plugins.conventionalcommits;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.LineReader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
+import hudson.ExtensionList;
 import hudson.FilePath;
 import hudson.model.TaskListener;
+import hudson.remoting.DelegatingCallable;
+import hudson.remoting.VirtualChannel;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import jenkins.SlaveToMasterFileCallable;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -17,6 +30,8 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import com.github.zafarkhaja.semver.Version;
+
+import static hudson.Util.fileToPath;
 
 public class NextVersionStep extends Step {
 
@@ -63,38 +78,32 @@ public class NextVersionStep extends Step {
 
         @Override
         protected String run() throws Exception {
-            Gitter git = new GitterImpl();
-
-            String latestTag = null;
-            if (StringUtils.isNotEmpty(startTag)) {
-                latestTag = startTag;
-            } else {
-                latestTag = git.latestTag();
+            // git describe --abbrev=0 --tags
+            String latestTag = "";
+            try {
+                latestTag = execute("git", "describe", "--abbrev=0", "--tags").trim();
+            } catch (IOException exp) {
+                if (exp.getMessage().contains("No names found, cannot describe anything.")) {
+                    getContext().get(TaskListener.class).getLogger().println("No tags found");
+                    latestTag = "0.0.0";
+                }
             }
-
+            
             getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
 
-            // TODO get a list of commits between 'this' and the tag
-            List<String> commits = git.commits(latestTag);
-            for (String commit: commits) {
-                getContext().get(TaskListener.class).getLogger().println("Commit: " + commit);
-            }
+            Version currentVersion = Version.valueOf(latestTag);
 
-            if (latestTag == null) {
-                getContext().get(TaskListener.class).getLogger().println("Setting current version to 0.0.0 as this appears to be the first release");
-            }
-            Version currentVersion = Version.valueOf(latestTag == null ? "0.0.0" : latestTag);
+            // TODO get a list of commits between 'this' and the tag
+            List<String> commitHistory = Collections.singletonList("chore: do something");
 
             // based on the commit list, determine how to bump the version
-            Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commits);
+            Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
 
             // TODO write the version using the output template
-
             getContext().get(TaskListener.class).getLogger().println(nextVersion);
 
-            return nextVersion.toString();
+            return null;
         }
-
     }
 
     @Extension
@@ -114,6 +123,32 @@ public class NextVersionStep extends Step {
         public String getFunctionName() {
             return "nextVersion";
         }
+    }
 
+    private static String execute(String... commandAndArgs) throws IOException, InterruptedException {
+        ProcessBuilder builder = new ProcessBuilder()
+                .command(commandAndArgs);
+
+        Process process = builder.start();
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            String stderr = stdout(process.getErrorStream());
+            throw new IOException("executing '" + String.join(" ", commandAndArgs) + "' failed with exit code" + exitCode + " and error " + stderr);
+        }
+        return stdout(process.getInputStream());
+    }
+
+    public static String stdout(InputStream in) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        LineReader reader = new LineReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        while (true) {
+            String line = reader.readLine();
+            if (line == null) {
+                break;
+            }
+            builder.append(line);
+            builder.append(System.getProperty("line.separator"));
+        }
+        return builder.toString();
     }
 }
