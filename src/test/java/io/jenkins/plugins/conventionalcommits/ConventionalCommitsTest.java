@@ -1,7 +1,6 @@
 package io.jenkins.plugins.conventionalcommits;
 
 import com.github.zafarkhaja.semver.Version;
-import io.jenkins.plugins.conventionalcommits.ConventionalCommits;
 import java.util.Arrays;
 import org.junit.Test;
 
@@ -9,10 +8,6 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.CoreMatchers.*;
 
 public class ConventionalCommitsTest {
-
-    public void willIgnoreMergeCommits() {
-
-    }
 
     @Test
     public void willBumpPatchVersion() {

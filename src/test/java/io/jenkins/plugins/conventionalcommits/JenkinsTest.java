@@ -34,7 +34,7 @@ public class JenkinsTest {
         System.out.println(rule.getLog(b));
         assertThat(rule.getLog(b), containsString("Started"));
         assertThat(rule.getLog(b), containsString("nextVersion"));
-        assertThat(rule.getLog(b), containsString("Setting current version to 0.0.0 as this appears to be the first release1"));
+        assertThat(rule.getLog(b), containsString("0.0.1"));
         assertThat(rule.getLog(b), containsString("Finished: SUCCESS"));
     }
 
