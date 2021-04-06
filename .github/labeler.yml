@@ -1,0 +1,31 @@
+---
+version: 1
+labels:
+  - label: "in progress"
+    title: "^WIP:.*"
+  - label: "in progress"
+    title: "^wip:.*"
+
+  - title: "feat.*"
+    label: "enhancement"
+
+  - title: "bug.*"
+    label: "bug"
+  - title: "fix.*"
+    label: "bug"
+
+  - title: "chore(deps).*"
+    label: "dependencies"
+
+  - branch: "^dependabot/.*"
+    label: "dependencies"
+
+  - title: "chore.*"
+    label: "chore"
+
+  - title: "docs.*"
+    label: "documentation"
+
+  - files:
+      - ".github/workflows/.*"
+    label: "github_actions"
