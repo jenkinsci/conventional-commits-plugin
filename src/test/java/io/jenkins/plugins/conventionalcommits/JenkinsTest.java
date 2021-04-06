@@ -32,9 +32,13 @@ public class JenkinsTest {
         WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
 
         System.out.println(rule.getLog(b));
+
+        assertThat(rule.getLog(b), containsString("workspace.isRemote(): false"));
+
         assertThat(rule.getLog(b), containsString("Started"));
         assertThat(rule.getLog(b), containsString("nextVersion"));
-        assertThat(rule.getLog(b), containsString("0.0.1"));
+        assertThat(rule.getLog(b), containsString("Current Tag is: 0.0.1"));
+        assertThat(rule.getLog(b), containsString("0.0.2"));
         assertThat(rule.getLog(b), containsString("Finished: SUCCESS"));
     }
 
