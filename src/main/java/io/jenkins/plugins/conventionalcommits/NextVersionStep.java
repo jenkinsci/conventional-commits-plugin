@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -78,29 +79,45 @@ public class NextVersionStep extends Step {
 
         @Override
         protected String run() throws Exception {
-            // git describe --abbrev=0 --tags
-            String latestTag = "";
-            try {
-                latestTag = execute("git", "describe", "--abbrev=0", "--tags").trim();
-            } catch (IOException exp) {
-                if (exp.getMessage().contains("No names found, cannot describe anything.")) {
-                    getContext().get(TaskListener.class).getLogger().println("No tags found");
-                    latestTag = "0.0.0";
-                }
+            FilePath workspace = getContext().get(FilePath.class);
+            if (workspace == null) {
+                throw new IOException("no workspace");
             }
-            
-            getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
 
-            Version currentVersion = Version.valueOf(latestTag);
+            // if the workspace is remote then lets make a local copy
+            if (workspace.isRemote()) {
+                throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
+            } else {
+                File dir = new File(workspace.getRemote());
+                // git describe --abbrev=0 --tags
+                String latestTag = "";
+                try {
+                    latestTag = execute(dir,"git", "describe", "--abbrev=0", "--tags").trim();
+                    getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
+                } catch (IOException exp) {
+                    if (exp.getMessage().contains("No names found, cannot describe anything.")) {
+                        getContext().get(TaskListener.class).getLogger().println("No tags found");
+                    }
+                }
 
-            // TODO get a list of commits between 'this' and the tag
-            List<String> commitHistory = Collections.singletonList("chore: do something");
+                Version currentVersion = Version.valueOf(latestTag.isEmpty() ? "0.0.0" : latestTag);
+                String commitMessagesString = null;
+                if (latestTag.isEmpty()) {
+                    commitMessagesString = execute(dir,"git", "log", "--pretty=format:%s").trim();
+                } else {
+                    // FIXME get a list of commits between 'this' and the tag
+                    // git log --pretty=format:%s tag..HEAD
+                    commitMessagesString = execute(dir,"git", "log", "--pretty=format:%s", latestTag + "..HEAD").trim();
+                }
 
-            // based on the commit list, determine how to bump the version
-            Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+                List<String> commitHistory = Arrays.asList(commitMessagesString.split("\n"));
 
-            // TODO write the version using the output template
-            getContext().get(TaskListener.class).getLogger().println(nextVersion);
+                // based on the commit list, determine how to bump the version
+                Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+
+                // TODO write the version using the output template
+                getContext().get(TaskListener.class).getLogger().println(nextVersion);
+            }
 
             return null;
         }
@@ -125,15 +142,16 @@ public class NextVersionStep extends Step {
         }
     }
 
-    private static String execute(String... commandAndArgs) throws IOException, InterruptedException {
+    private static String execute(File dir, String... commandAndArgs) throws IOException, InterruptedException {
         ProcessBuilder builder = new ProcessBuilder()
+                .directory(dir)
                 .command(commandAndArgs);
 
         Process process = builder.start();
         int exitCode = process.waitFor();
         if (exitCode != 0) {
             String stderr = stdout(process.getErrorStream());
-            throw new IOException("executing '" + String.join(" ", commandAndArgs) + "' failed with exit code" + exitCode + " and error " + stderr);
+            throw new IOException("executing '" + String.join(" ", commandAndArgs) + "' failed in '" + dir + "' with exit code" + exitCode + " and error " + stderr);
         }
         return stdout(process.getInputStream());
     }
