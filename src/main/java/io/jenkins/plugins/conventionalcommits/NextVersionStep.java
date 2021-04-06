@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -107,12 +108,10 @@ public class NextVersionStep extends Step {
 
                 Version currentVersion = Version.valueOf(latestTag);
 
-                // git log --pretty=format:'%h : %s'
-                String commitMessages = execute(dir,"git", "log", "--pretty=format:'%s'").trim();
-                getContext().get(TaskListener.class).getLogger().println("Commits>\n" + commitMessages);
-
-                // TODO get a list of commits between 'this' and the tag
-                List<String> commitHistory = Collections.singletonList("chore: do something");
+                // git log --pretty=format:%s
+                // FIXME get a list of commits between 'this' and the tag
+                String commitMessagesString = execute(dir,"git", "log", "--pretty=format:%s").trim();
+                List<String> commitHistory = Arrays.asList(commitMessagesString.split("\n"));
 
                 // based on the commit list, determine how to bump the version
                 Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
