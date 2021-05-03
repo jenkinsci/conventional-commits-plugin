@@ -4,7 +4,7 @@
 [![Contributors](https://img.shields.io/github/contributors/jenkinsci/conventional-commits-plugin.svg)](https://github.com/jenkinsci/conventional-commits-plugin/graphs/contributors)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/conventional-commits.svg)](https://plugins.jenkins.io/conventional-commits)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/conventional-commits-plugin.svg?label=changelog)](https://github.com/jenkinsci/conventional-commits-plugin/releases/latest)
-[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/conventional-commits.svg?color=blue)](https://plugins.jenkins.io/conventional-commits)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/conventional-commits-plugin.svg?color=blue)](https://plugins.jenkins.io/conventional-commits)
 
 ## Introduction
 
