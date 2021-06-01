@@ -1,11 +1,14 @@
 package io.jenkins.plugins.conventionalcommits;
 
 import com.github.zafarkhaja.semver.Version;
-import java.util.Arrays;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.CoreMatchers.*;
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ConventionalCommitsTest {
 
@@ -76,6 +79,62 @@ public class ConventionalCommitsTest {
                 "BREAKING CHANGE: another major version",
                 "feat: new feature",
                 "chore: bug fix"));
+        assertThat(out, is(notNullValue()));
+        assertThat(out.toString(), is("1.0.0"));
+    }
+
+    @Test
+    public void willBumpMajorVersion_ExclamationCommit() {
+        ConventionalCommits cc = new ConventionalCommits();
+
+        Version out = cc.nextVersion(Version.valueOf("0.0.1"), Collections.singletonList(
+                "feat!: new major version"));
+        assertThat(out, is(notNullValue()));
+        assertThat(out.toString(), is("1.0.0"));
+    }
+
+    @Test
+    public void willBumpMajorVersion_FooterMultipleLineCommit() {
+        ConventionalCommits cc = new ConventionalCommits();
+
+        Version out = cc.nextVersion(Version.valueOf("0.0.1"), Collections.singletonList(
+                "feat: new major version \nBREAKING CHANGE: new breaking change"
+        ));
+        assertThat(out, is(notNullValue()));
+        assertThat(out.toString(), is("1.0.0"));
+    }
+
+    @Test
+    public void willNotBumpMajorVersion_ExclamationMultipleLineCommitNotFooter() {
+        ConventionalCommits cc = new ConventionalCommits();
+
+        Version out = cc.nextVersion(Version.valueOf("0.0.1"), Collections.singletonList(
+                "chore: new major version \nBREAKING CHANGE: new breaking change \nstupid footer"
+        ));
+        assertThat(out, is(notNullValue()));
+        assertThat(out.toString(), is("0.0.2"));
+    }
+
+    @Test
+    public void willBumpMajorVersion_MultipleCommitsMultipleLineExclamation() {
+        ConventionalCommits cc = new ConventionalCommits();
+
+        Version out = cc.nextVersion(Version.valueOf("0.0.1"), Arrays.asList(
+                "feat!: add new feature",
+                "fix: bug fix",
+                "fix: another fix"));
+        assertThat(out, is(notNullValue()));
+        assertThat(out.toString(), is("1.0.0"));
+    }
+
+    @Test
+    public void willBumpMajorVersion_MultipleCommitsMultipleLineFooter() {
+        ConventionalCommits cc = new ConventionalCommits();
+
+        Version out = cc.nextVersion(Version.valueOf("0.0.1"), Arrays.asList(
+                "feat: add new feature",
+                "fix: bug fix \nBREAKING CHANGE: breaking change",
+                "fix: another fix"));
         assertThat(out, is(notNullValue()));
         assertThat(out.toString(), is("1.0.0"));
     }

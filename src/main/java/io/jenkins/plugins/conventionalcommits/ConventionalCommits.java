@@ -12,7 +12,7 @@ public class ConventionalCommits {
 
     public Version nextVersion(Version in, List<String> commits) {
         List<String> filtered = filterMergeCommits(commits);
-        List<String> breaking = filtered.stream().filter(s -> s.startsWith("BREAKING CHANGE")).collect(Collectors.toList());
+        List<String> breaking = filtered.stream().filter(s -> s.contains("!:") || breakingChangeFooter(s) ).collect(Collectors.toList());
         List<String> features = filtered.stream().filter(s -> s.startsWith("feat")).collect(Collectors.toList());
 
         if (!breaking.isEmpty()) {
@@ -24,5 +24,16 @@ public class ConventionalCommits {
         }
 
         return in.incrementPatchVersion();
+    }
+
+    private boolean breakingChangeFooter(String commit){
+        int startIndex = commit.lastIndexOf("\n");
+
+        String result = commit;
+
+        if(startIndex!=-1 && startIndex!= commit.length()){
+            result = commit.substring(startIndex+1);
+        }
+        return result.startsWith("BREAKING CHANGE");
     }
 }
