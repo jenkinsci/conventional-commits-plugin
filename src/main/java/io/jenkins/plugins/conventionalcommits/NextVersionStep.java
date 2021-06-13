@@ -4,25 +4,20 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.LineReader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
-import hudson.ExtensionList;
 import hudson.FilePath;
 import hudson.model.TaskListener;
-import hudson.remoting.DelegatingCallable;
-import hudson.remoting.VirtualChannel;
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import jenkins.SlaveToMasterFileCallable;
-import org.apache.commons.lang.StringUtils;
+
+import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
@@ -31,8 +26,6 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import com.github.zafarkhaja.semver.Version;
-
-import static hudson.Util.fileToPath;
 
 public class NextVersionStep extends Step {
 
@@ -100,7 +93,8 @@ public class NextVersionStep extends Step {
                     }
                 }
 
-                Version currentVersion = Version.valueOf(latestTag.isEmpty() ? "0.0.0" : latestTag);
+                Version currentVersion = new CurrentVersion().getCurrentVersion(dir, latestTag);
+
                 String commitMessagesString = null;
                 if (latestTag.isEmpty()) {
                     commitMessagesString = execute(dir,"git", "log", "--pretty=format:%s").trim();
