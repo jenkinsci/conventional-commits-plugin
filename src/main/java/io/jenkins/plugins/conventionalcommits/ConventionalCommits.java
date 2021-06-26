@@ -27,13 +27,18 @@ public class ConventionalCommits {
     }
 
     private boolean breakingChangeFooter(String commit){
-        int startIndex = commit.lastIndexOf("\n");
 
-        String result = commit;
+        boolean result = false;
+        String[] lines = commit.split("[\\r\\n]+");
 
-        if(startIndex!=-1 && startIndex!= commit.length()){
-            result = commit.substring(startIndex+1);
+        for(String line: lines){
+            if (line.startsWith("BREAKING CHANGE") || line.startsWith("BREAKING-CHANGE")) {
+                result = true;
+                break;
+            }
         }
-        return result.startsWith("BREAKING CHANGE");
+
+        return result;
     }
+
 }

@@ -105,14 +105,14 @@ public class ConventionalCommitsTest {
     }
 
     @Test
-    public void willNotBumpMajorVersion_ExclamationMultipleLineCommitNotFooter() {
+    public void willBumpMajorVersion_ExclamationMultipleLineCommitNotFooter() {
         ConventionalCommits cc = new ConventionalCommits();
 
         Version out = cc.nextVersion(Version.valueOf("0.0.1"), Collections.singletonList(
-                "chore: new major version \nBREAKING CHANGE: new breaking change \nstupid footer"
+                "chore: new major version \nBREAKING CHANGE: new breaking change \nextra footer"
         ));
         assertThat(out, is(notNullValue()));
-        assertThat(out.toString(), is("0.0.2"));
+        assertThat(out.toString(), is("1.0.0"));
     }
 
     @Test
