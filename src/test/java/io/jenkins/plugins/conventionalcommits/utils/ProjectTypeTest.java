@@ -1,17 +1,12 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
-import com.github.zafarkhaja.semver.Version;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-
-import hudson.tasks.Maven;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.hamcrest.MatcherAssert.*;
+import java.io.File;
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 
 public class ProjectTypeTest {
@@ -35,6 +30,24 @@ public class ProjectTypeTest {
         File mavenDir = rootFolder.newFolder("SampleMavenProject");
         ProjectType projectType = new MavenProjectType();
         assertEquals(false, projectType.check(mavenDir));
+    }
+
+    @Test
+    public void isGradleProject() throws IOException {
+
+        File gradleDir = rootFolder.newFolder("SampleGradleProject");
+        rootFolder.newFile(gradleDir.getName() + File.separator + "build.gradle");
+
+        ProjectType projectType = new GradleProjectType();
+        assertEquals(true, projectType.check(gradleDir));
+    }
+
+    @Test
+    public void isNotGradleProject() throws IOException {
+
+        File gradleDir = rootFolder.newFolder("SampleGradleProject");
+        ProjectType projectType = new GradleProjectType();
+        assertEquals(false, projectType.check(gradleDir));
     }
 
 }

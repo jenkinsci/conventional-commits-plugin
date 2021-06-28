@@ -10,6 +10,7 @@ public class ProjectTypeFactory {
     static Map<String, ProjectType> projectTypeMap = new HashMap<>();
     static {
         projectTypeMap.put("maven", new MavenProjectType());
+        projectTypeMap.put("gradle", new GradleProjectType());
     }
 
     public static ProjectType getProjectType(File directory) {

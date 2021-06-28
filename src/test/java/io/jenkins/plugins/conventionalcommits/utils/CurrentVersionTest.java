@@ -1,17 +1,17 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CurrentVersionTest {
 
@@ -38,6 +38,34 @@ public class CurrentVersionTest {
         Version actualCurrentVersion = Version.valueOf("1.0.0");
         CurrentVersion currentVersion = new CurrentVersion();
         Version testCurrentVersion = currentVersion.getCurrentVersion(mavenDir, "");
+
+        assertThat(testCurrentVersion, is(notNullValue()));
+        assertThat(actualCurrentVersion, is(testCurrentVersion));
+    }
+
+    @Test
+    public void testGradleProjectVersion() throws IOException, InterruptedException {
+
+        File gradleDir = rootFolder.newFolder("SampleGradleProject");
+        File buildGradle = rootFolder.newFile(gradleDir.getName() + File.separator + "build.gradle");
+
+        String buildGradleContent = "group 'com.sample.gradle'\n" +
+                "version = '1.0.0'\n" +
+                "\n" +
+                "apply plugin: 'java'\n" +
+                "\n" +
+                "sourceCompatibility = 1.8\n" +
+                "\n" +
+                "sourceCompatibility = 1.8\n" +
+                "targetCompatibility = 1.8";
+
+        FileWriter buildGradleWriter = new FileWriter(buildGradle);
+        buildGradleWriter.write(buildGradleContent);
+        buildGradleWriter.close();
+
+        Version actualCurrentVersion = Version.valueOf("1.0.0");
+        CurrentVersion currentVersion = new CurrentVersion();
+        Version testCurrentVersion = currentVersion.getCurrentVersion(gradleDir, "");
 
         assertThat(testCurrentVersion, is(notNullValue()));
         assertThat(actualCurrentVersion, is(testCurrentVersion));
