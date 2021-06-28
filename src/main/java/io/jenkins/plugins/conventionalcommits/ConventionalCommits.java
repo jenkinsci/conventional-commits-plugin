@@ -32,7 +32,7 @@ public class ConventionalCommits {
         String[] lines = commit.split("[\\r\\n]+");
 
         for(String line: lines){
-            if (line.startsWith("BREAKING CHANGE") || line.startsWith("BREAKING-CHANGE")) {
+            if (line.startsWith("BREAKING CHANGE:") || line.startsWith("BREAKING-CHANGE:")) {
                 result = true;
                 break;
             }
