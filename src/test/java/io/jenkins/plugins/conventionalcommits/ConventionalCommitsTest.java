@@ -138,4 +138,17 @@ public class ConventionalCommitsTest {
         assertThat(out, is(notNullValue()));
         assertThat(out.toString(), is("1.0.0"));
     }
+
+    @Test
+    public void willNotBumpMajorVersion_BreakingChangeCaseSensitivity() {
+        ConventionalCommits cc = new ConventionalCommits();
+        Version out = cc.nextVersion(Version.valueOf("0.0.1"), Arrays.asList(
+                "feat: add new feature",
+                "fix: bug fix \nBreaking Change: breaking change",
+                "fix: bug fix \nBREAKING change: breaking change"
+                ));
+
+        assertThat(out, is(notNullValue()));
+        assertThat(out.toString(), is("0.1.0"));
+    }
 }
