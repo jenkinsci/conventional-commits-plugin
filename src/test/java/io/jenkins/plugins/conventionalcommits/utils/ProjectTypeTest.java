@@ -1,17 +1,12 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
-import com.github.zafarkhaja.semver.Version;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-
-import hudson.tasks.Maven;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.hamcrest.MatcherAssert.*;
+import java.io.File;
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 
 public class ProjectTypeTest {
@@ -37,4 +32,22 @@ public class ProjectTypeTest {
         assertEquals(false, projectType.check(mavenDir));
     }
 
+    @Test
+    public void should_is_npm_project() throws IOException{
+        File npmDir = rootFolder.newFolder("SampleNpmFolder");
+        rootFolder.newFile(npmDir.getName() + File.separator + "package.json");
+
+        ProjectType projectType = new NpmProjectType();
+
+        assertEquals(true, projectType.check(npmDir));
+    }
+
+    @Test
+    public void should_is_not_npm_project() throws IOException{
+        File npmDir = rootFolder.newFolder("SampleNpmFolder");
+
+        ProjectType projectType = new NpmProjectType();
+
+        assertEquals(false, projectType.check(npmDir));
+    }
 }
