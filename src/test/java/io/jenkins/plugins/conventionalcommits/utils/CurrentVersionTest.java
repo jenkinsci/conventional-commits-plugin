@@ -8,10 +8,14 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CurrentVersionTest {
 
@@ -46,6 +50,14 @@ public class CurrentVersionTest {
     @Test
     public void testGradleProjectVersion() throws IOException, InterruptedException {
 
+        String os = System.getProperty("os.name");
+        String commandName = "gradle";
+
+        if (os.contains("Windows")) {
+            commandName += ".bat";
+        }
+        List<String> command = Arrays.asList(commandName, "-q", "properties");
+
         File gradleDir = rootFolder.newFolder("SampleGradleProject");
         File buildGradle = rootFolder.newFile(gradleDir.getName() + File.separator + "build.gradle");
 
@@ -62,6 +74,9 @@ public class CurrentVersionTest {
         FileWriter buildGradleWriter = new FileWriter(buildGradle);
         buildGradleWriter.write(buildGradleContent);
         buildGradleWriter.close();
+
+        ProcessHelper processHelper = mock(ProcessHelper.class);
+        when(processHelper.runProcessBuilder(gradleDir, command)).thenReturn("version: 1.0.0");
 
         Version actualCurrentVersion = Version.valueOf("1.0.0");
         CurrentVersion currentVersion = new CurrentVersion();

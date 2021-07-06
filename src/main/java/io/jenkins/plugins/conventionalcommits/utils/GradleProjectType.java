@@ -1,14 +1,14 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 
-public class GradleProjectType extends ProjectType{
+public class GradleProjectType extends ProjectType implements ProcessHelper {
 
     public boolean check(File directory){
         return new File(directory, "build.gradle").exists();
@@ -24,15 +24,8 @@ public class GradleProjectType extends ProjectType{
             commandName += ".bat";
         }
 
-        ProcessBuilder processBuilder = new ProcessBuilder(
-                commandName, "properties", "-q"
-        );
-
-        processBuilder.directory(directory);
-        Process process = processBuilder.start();
-
-        String results = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
-        process.waitFor();
+        List<String> command = Arrays.asList(commandName, "-q", "properties");
+        String results = runProcessBuilder(directory, command);
 
         String version = "undefined";
 
