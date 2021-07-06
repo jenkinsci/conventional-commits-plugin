@@ -4,6 +4,7 @@ import com.github.zafarkhaja.semver.Version;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Class to interact with a NPM project type.
@@ -18,7 +19,7 @@ public class NpmProjectType extends ProjectType {
      */
     @Override
     public boolean check(File directory) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return new File(directory, "package.json").exists();
     }
 
     /**
