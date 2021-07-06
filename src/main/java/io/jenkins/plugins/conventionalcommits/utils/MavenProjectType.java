@@ -1,6 +1,7 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
+import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -14,7 +15,7 @@ public class MavenProjectType extends ProjectType {
     }
 
     @Override
-    public Version getCurrentVersion(File directory) throws IOException, InterruptedException{
+    public Version getCurrentVersion(File directory, ProcessHelper processHelper) throws IOException, InterruptedException{
 
         String os = System.getProperty("os.name");
         String commandName = "mvn";
@@ -23,6 +24,7 @@ public class MavenProjectType extends ProjectType {
             commandName += ".cmd";
         }
 
+        // FIXME use process helper here
         ProcessBuilder processBuilder = new ProcessBuilder(
                 commandName, "help:evaluate",
                 "-Dexpression=project.version", "-q", "-DforceStdout"
