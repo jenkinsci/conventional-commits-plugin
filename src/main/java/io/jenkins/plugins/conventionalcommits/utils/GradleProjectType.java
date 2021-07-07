@@ -1,6 +1,7 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
+import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,14 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class GradleProjectType extends ProjectType implements ProcessHelper {
+public class GradleProjectType extends ProjectType {
 
     public boolean check(File directory){
         return new File(directory, "build.gradle").exists();
     }
 
     @Override
-    public Version getCurrentVersion(File directory) throws IOException, InterruptedException{
+    public Version getCurrentVersion(File directory, ProcessHelper processHelper) throws IOException, InterruptedException{
 
         String os = System.getProperty("os.name");
         String commandName = "gradle";
@@ -25,7 +26,7 @@ public class GradleProjectType extends ProjectType implements ProcessHelper {
         }
 
         List<String> command = Arrays.asList(commandName, "-q", "properties");
-        String results = runProcessBuilder(directory, command);
+        String results = processHelper.runProcessBuilder(directory, command);
 
         String version = "undefined";
 

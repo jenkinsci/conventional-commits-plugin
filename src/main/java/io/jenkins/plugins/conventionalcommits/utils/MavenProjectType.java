@@ -1,11 +1,12 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
-import org.apache.commons.io.IOUtils;
+import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 public class MavenProjectType extends ProjectType {
 
@@ -14,7 +15,7 @@ public class MavenProjectType extends ProjectType {
     }
 
     @Override
-    public Version getCurrentVersion(File directory) throws IOException, InterruptedException{
+    public Version getCurrentVersion(File directory, ProcessHelper processHelper) throws IOException, InterruptedException{
 
         String os = System.getProperty("os.name");
         String commandName = "mvn";
@@ -23,16 +24,9 @@ public class MavenProjectType extends ProjectType {
             commandName += ".cmd";
         }
 
-        ProcessBuilder processBuilder = new ProcessBuilder(
-                commandName, "help:evaluate",
-                "-Dexpression=project.version", "-q", "-DforceStdout"
-        );
-
-        processBuilder.directory(directory);
-        Process process = processBuilder.start();
-
-        String results = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
-        process.waitFor();
+        List<String> command = Arrays.asList(commandName, "help:evaluate",
+                "-Dexpression=project.version", "-q", "-DforceStdout");
+        String results = processHelper.runProcessBuilder(directory, command);
 
         return Version.valueOf(results);
     }

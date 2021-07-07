@@ -1,4 +1,4 @@
-package io.jenkins.plugins.conventionalcommits.utils;
+package io.jenkins.plugins.conventionalcommits.process;
 
 import org.apache.commons.io.IOUtils;
 
@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public interface ProcessHelper {
-    default String runProcessBuilder(File directory, List<String> command) throws IOException, InterruptedException {
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
+public class DefaultProcessHelper implements ProcessHelper {
 
+    @Override
+    public String runProcessBuilder(File directory, List<String> command) throws IOException, InterruptedException {
+
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.directory(directory);
         Process process = processBuilder.start();
 
