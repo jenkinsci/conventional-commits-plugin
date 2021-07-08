@@ -1,13 +1,14 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
+import com.github.zafarkhaja.semver.Version;
+import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
+
 import java.io.File;
 import java.io.IOException;
-
-import com.github.zafarkhaja.semver.Version;
 
 abstract class ProjectType {
 
     public abstract boolean check(File directory);
-    public abstract Version getCurrentVersion(File directory) throws IOException, InterruptedException;
+    public abstract Version getCurrentVersion(File directory, ProcessHelper processHelper) throws IOException, InterruptedException;
 
 }
