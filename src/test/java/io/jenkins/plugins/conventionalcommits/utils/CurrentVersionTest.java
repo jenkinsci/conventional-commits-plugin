@@ -111,6 +111,30 @@ public class CurrentVersionTest {
     }
 
     @Test
+    public void testMakeProjectVersion() throws IOException, InterruptedException {
+
+        File makeDir = rootFolder.newFolder("SampleMakeProject");
+        File makeFile = rootFolder.newFile(makeDir.getName() + File.separator + "Makefile");
+
+        String makeFileContent = "name=sample\n" +
+                "version=1.10.0\n" +
+                "\n" +
+                "build:\n" +
+                "\techo \"hello world\" \n";
+
+        FileWriter makeFileWriter = new FileWriter(makeFile);
+        makeFileWriter.write(makeFileContent);
+        makeFileWriter.close();
+
+        Version actualCurrentVersion = Version.valueOf("1.10.0");
+        CurrentVersion currentVersion = new CurrentVersion();
+        Version testCurrentVersion = currentVersion.getCurrentVersion(makeDir, "");
+
+        assertThat(testCurrentVersion, is(notNullValue()));
+        assertThat(actualCurrentVersion, is(testCurrentVersion));
+    }
+
+    @Test
     public void CurrentVersion_NoProjectWithTag() throws IOException, InterruptedException {
 
         File testDir = rootFolder.newFolder("SampleProject");
