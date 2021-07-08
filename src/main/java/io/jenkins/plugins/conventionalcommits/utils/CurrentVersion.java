@@ -20,19 +20,18 @@ public class CurrentVersion {
     }
 
     public Version getCurrentVersion(File directory, String latestTag) throws IOException, InterruptedException {
-
         Version currentVersion;
         ProjectType projectType = ProjectTypeFactory.getProjectType(directory);
 
         if (projectType != null) {
-            if (processHelper == null)
+            if (processHelper == null) {
                 processHelper = new DefaultProcessHelper();
+            }
             currentVersion = projectType.getCurrentVersion(directory, processHelper);
-        } else
+        } else {
             currentVersion = getCurrentVersionTag(latestTag);
+        }
 
         return  currentVersion;
     }
-
-
 }
