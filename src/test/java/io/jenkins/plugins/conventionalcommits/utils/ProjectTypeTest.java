@@ -50,4 +50,23 @@ public class ProjectTypeTest {
         assertEquals(false, projectType.check(gradleDir));
     }
 
+    @Test
+    public void isMakeProject() throws IOException {
+
+        File makeDir = rootFolder.newFolder("SampleMakeProject");
+        rootFolder.newFile(makeDir.getName() + File.separator + "Makefile");
+
+        ProjectType projectType = new MakeProjectType();
+        assertEquals(true, projectType.check(makeDir));
+    }
+
+    @Test
+    public void isNotMakeProject() throws IOException {
+
+        File makeDir = rootFolder.newFolder("SampleMakeProject");
+
+        ProjectType projectType = new MakeProjectType();
+        assertEquals(false, projectType.check(makeDir));
+    }
+
 }
