@@ -9,48 +9,57 @@ import java.util.stream.Collectors;
 
 public class ConventionalCommits {
 
-    LogUtils logger = new LogUtils();
+  LogUtils logger = new LogUtils();
 
-    private List<String> filterMergeCommits(List<String> commits) {
-        return commits.stream().filter(s -> !s.startsWith("Merge")).collect(Collectors.toList());
+  private List<String> filterMergeCommits(List<String> commits) {
+    return commits.stream().filter(s -> !s.startsWith("Merge")).collect(Collectors.toList());
+  }
+
+  public Version nextVersion(Version in, List<String> commits) {
+    List<String> filtered = filterMergeCommits(commits);
+    List<String> breaking =
+        filtered.stream()
+            .filter(s -> s.contains("!:") || breakingChangeFooter(s))
+            .collect(Collectors.toList());
+    List<String> features =
+        filtered.stream().filter(s -> s.startsWith("feat")).collect(Collectors.toList());
+
+    if (!breaking.isEmpty()) {
+      return in.incrementMajorVersion();
     }
 
-    public Version nextVersion(Version in, List<String> commits) {
-        List<String> filtered = filterMergeCommits(commits);
-        List<String> breaking = filtered.stream().filter(s -> s.contains("!:") || breakingChangeFooter(s)).collect(Collectors.toList());
-        List<String> features = filtered.stream().filter(s -> s.startsWith("feat")).collect(Collectors.toList());
-
-        if (!breaking.isEmpty()) {
-            return in.incrementMajorVersion();
-        }
-
-        if (!features.isEmpty()) {
-            return in.incrementMinorVersion();
-        }
-
-        return in.incrementPatchVersion();
+    if (!features.isEmpty()) {
+      return in.incrementMinorVersion();
     }
 
-    private boolean breakingChangeFooter(String commit) {
+    return in.incrementPatchVersion();
+  }
 
-        boolean result = false;
-        String[] lines = commit.split("[\\r\\n]+");
+  private boolean breakingChangeFooter(String commit) {
 
-        for (String line : lines) {
-            if (line.startsWith("BREAKING CHANGE:") || line.startsWith("BREAKING-CHANGE:")) {
-                result = true;
-                break;
-            } else if (line.toLowerCase().startsWith("breaking change:") || line.toLowerCase().startsWith("breaking-change:")) {
-                String keyword = line.substring(0, 16);
-                logger.log(
-                        Level.INFO, Level.INFO, Level.FINE, Level.FINE, true,
-                        "'" + keyword + "' detected which is not compliant with Conventional Commits Guidelines " +
-                                "(https://www.conventionalcommits.org/en/v1.0.0/#summary)"
-                );
-            }
-        }
+    boolean result = false;
+    String[] lines = commit.split("[\\r\\n]+");
 
-        return result;
+    for (String line : lines) {
+      if (line.startsWith("BREAKING CHANGE:") || line.startsWith("BREAKING-CHANGE:")) {
+        result = true;
+        break;
+      } else if (line.toLowerCase().startsWith("breaking change:")
+          || line.toLowerCase().startsWith("breaking-change:")) {
+        String keyword = line.substring(0, 16);
+        logger.log(
+            Level.INFO,
+            Level.INFO,
+            Level.FINE,
+            Level.FINE,
+            true,
+            "'"
+                + keyword
+                + "' detected which is not compliant with Conventional Commits Guidelines "
+                + "(https://www.conventionalcommits.org/en/v1.0.0/#summary)");
+      }
     }
 
+    return result;
+  }
 }

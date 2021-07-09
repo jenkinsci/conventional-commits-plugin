@@ -8,7 +8,8 @@ import java.io.IOException;
 
 abstract class ProjectType {
 
-    public abstract boolean check(File directory);
-    public abstract Version getCurrentVersion(File directory, ProcessHelper processHelper) throws IOException, InterruptedException;
+  public abstract boolean check(File directory);
 
+  public abstract Version getCurrentVersion(File directory, ProcessHelper processHelper)
+      throws IOException, InterruptedException;
 }
