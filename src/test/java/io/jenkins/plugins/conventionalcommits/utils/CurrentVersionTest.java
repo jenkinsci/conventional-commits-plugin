@@ -135,6 +135,32 @@ public class CurrentVersionTest {
     }
 
     @Test
+    public void testNpmProjectVersion() throws IOException, InterruptedException {
+
+        File npmDir = rootFolder.newFolder("SampleNPMProject");
+        File packageJson = rootFolder.newFile(npmDir.getName() + File.separator + "package.json");
+
+        String packageJsonContent= "{\"name\": \"test-project\",\n" +
+                "  \"version\": \"1.0.0\",\n" +
+                "  \"description\": \"A description\"}";
+
+        FileWriter packageJsonWriter = new FileWriter(packageJson);
+        packageJsonWriter.write(packageJsonContent);
+        packageJsonWriter.close();
+
+        Version actualCurrentVersion = Version.valueOf("1.0.0");
+        CurrentVersion currentVersion = new CurrentVersion();
+        Version testCurrentVersion = currentVersion.getCurrentVersion(npmDir, "");
+
+        assertThat(testCurrentVersion, is(notNullValue()));
+        assertThat(actualCurrentVersion, is(testCurrentVersion));
+    }
+
+    @Test
+    public void should_throw_npe_if_null_directory() {
+
+    }
+    @Test
     public void CurrentVersion_NoProjectWithTag() throws IOException, InterruptedException {
 
         File testDir = rootFolder.newFolder("SampleProject");
