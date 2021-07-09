@@ -69,4 +69,22 @@ public class ProjectTypeTest {
         assertEquals(false, projectType.check(makeDir));
     }
 
+    @Test
+    public void should_is_npm_project() throws IOException{
+        File npmDir = rootFolder.newFolder("SampleNpmFolder");
+        rootFolder.newFile(npmDir.getName() + File.separator + "package.json");
+
+        ProjectType projectType = new NpmProjectType();
+
+        assertEquals(true, projectType.check(npmDir));
+    }
+
+    @Test
+    public void should_is_not_npm_project() throws IOException{
+        File npmDir = rootFolder.newFolder("SampleNpmFolder");
+
+        ProjectType projectType = new NpmProjectType();
+
+        assertEquals(false, projectType.check(npmDir));
+    }
 }

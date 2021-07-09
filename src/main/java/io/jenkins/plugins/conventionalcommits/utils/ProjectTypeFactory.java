@@ -12,6 +12,7 @@ public class ProjectTypeFactory {
         projectTypeMap.put("maven", new MavenProjectType());
         projectTypeMap.put("gradle", new GradleProjectType());
         projectTypeMap.put("make", new MakeProjectType());
+        projectTypeMap.put("npm", new NpmProjectType());
     }
 
     public static ProjectType getProjectType(File directory) {
