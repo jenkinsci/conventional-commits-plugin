@@ -87,4 +87,24 @@ public class ProjectTypeTest {
 
         assertEquals(false, projectType.check(npmDir));
     }
+
+    @Test
+    public void isPythonProject() throws IOException {
+
+        File pyDir = rootFolder.newFolder("SamplePythonProject");
+        rootFolder.newFile(pyDir.getName() + File.separator + "setup.py");
+
+        ProjectType projectType = new PythonProjectType();
+        assertEquals(true, projectType.check(pyDir));
+    }
+
+    @Test
+    public void isNotPythonProject() throws IOException {
+
+        File pyDir = rootFolder.newFolder("SamplePythonProject");
+
+        ProjectType projectType = new PythonProjectType();
+        assertEquals(false, projectType.check(pyDir));
+    }
+
 }
