@@ -5,6 +5,7 @@ import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class MakeProjectType extends ProjectType{
@@ -21,7 +22,7 @@ public class MakeProjectType extends ProjectType{
 
         String filePath = directory.getAbsolutePath() + System.getProperty("file.separator") + MAKEFILE_FILENAME;
         File makeFile = new File(filePath);
-        Scanner scanner = new Scanner(makeFile);
+        Scanner scanner = new Scanner(makeFile, StandardCharsets.UTF_8.name());
         String results = "";
 
         while (scanner.hasNextLine()) {
