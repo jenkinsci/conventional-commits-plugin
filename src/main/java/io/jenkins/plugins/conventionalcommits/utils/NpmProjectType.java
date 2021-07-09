@@ -2,6 +2,7 @@ package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
+import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,11 +32,12 @@ public class NpmProjectType extends ProjectType {
      * Return the next version of the version attribute.
      *
      * @param directory The project's directory.
+     * @param processHelper Not used.
      * @return The next calculated version (based on Semver).
      * @throws IOException If an error occur reading files.
      */
     @Override
-    public Version getCurrentVersion(File directory) throws IOException {
+    public Version getCurrentVersion(File directory, ProcessHelper processHelper) throws IOException {
         Objects.requireNonNull(directory);
 
         ObjectMapper mapper = new ObjectMapper();

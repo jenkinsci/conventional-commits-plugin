@@ -33,6 +33,43 @@ public class ProjectTypeTest {
     }
 
     @Test
+    public void isGradleProject() throws IOException {
+
+        File gradleDir = rootFolder.newFolder("SampleGradleProject");
+        rootFolder.newFile(gradleDir.getName() + File.separator + "build.gradle");
+
+        ProjectType projectType = new GradleProjectType();
+        assertEquals(true, projectType.check(gradleDir));
+    }
+
+    @Test
+    public void isNotGradleProject() throws IOException {
+
+        File gradleDir = rootFolder.newFolder("SampleGradleProject");
+        ProjectType projectType = new GradleProjectType();
+        assertEquals(false, projectType.check(gradleDir));
+    }
+
+    @Test
+    public void isMakeProject() throws IOException {
+
+        File makeDir = rootFolder.newFolder("SampleMakeProject");
+        rootFolder.newFile(makeDir.getName() + File.separator + "Makefile");
+
+        ProjectType projectType = new MakeProjectType();
+        assertEquals(true, projectType.check(makeDir));
+    }
+
+    @Test
+    public void isNotMakeProject() throws IOException {
+
+        File makeDir = rootFolder.newFolder("SampleMakeProject");
+
+        ProjectType projectType = new MakeProjectType();
+        assertEquals(false, projectType.check(makeDir));
+    }
+
+    @Test
     public void should_is_npm_project() throws IOException{
         File npmDir = rootFolder.newFolder("SampleNpmFolder");
         rootFolder.newFile(npmDir.getName() + File.separator + "package.json");
