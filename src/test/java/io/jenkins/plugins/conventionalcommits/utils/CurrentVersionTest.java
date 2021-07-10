@@ -23,235 +23,227 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CurrentVersionTest {
 
-    @Rule
-    public TemporaryFolder rootFolder = new TemporaryFolder();
+  @Rule public TemporaryFolder rootFolder = new TemporaryFolder();
 
-    @Mock
-    private ProcessHelper processHelper;
+  @Mock private ProcessHelper processHelper;
 
-    @Test
-    public void testMavenProjectVersion() throws IOException, InterruptedException {
+  @Test
+  public void testMavenProjectVersion() throws IOException, InterruptedException {
 
-        String os = System.getProperty("os.name");
-        String commandName = "mvn";
+    String os = System.getProperty("os.name");
+    String commandName = "mvn";
 
-        if (os.contains("Windows")) {
-            commandName += ".cmd";
-        }
-
-        List<String> command = Arrays.asList(commandName, "help:evaluate",
-                "-Dexpression=project.version", "-q", "-DforceStdout");
-
-        File mavenDir = rootFolder.newFolder("SampleMavenProject");
-        File pom = rootFolder.newFile(mavenDir.getName() + File.separator + "pom.xml");
-
-        String pomContent = "<project>\n" +
-                " <modelVersion>4.0.0</modelVersion>\n" +
-                " <groupId>com.test.app</groupId>\n" +
-                " <artifactId>test-app</artifactId>\n" +
-                " <version>1.0.0</version>\n" +
-                "</project>\n";
-
-        FileWriter pomWriter = new FileWriter(pom);
-        pomWriter.write(pomContent);
-        pomWriter.close();
-
-        assertThat(processHelper, is(notNullValue()));
-        when(processHelper.runProcessBuilder(mavenDir, command)).thenReturn("1.0.0");
-
-        Version actualCurrentVersion = Version.valueOf("1.0.0");
-        CurrentVersion currentVersion = new CurrentVersion();
-        currentVersion.setProcessHelper(processHelper);
-
-        Version testCurrentVersion = currentVersion.getCurrentVersion(mavenDir, "");
-
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
+    if (os.contains("Windows")) {
+      commandName += ".cmd";
     }
 
-    @Test
-    public void testGradleProjectVersion() throws IOException, InterruptedException {
+    List<String> command =
+        Arrays.asList(
+            commandName, "help:evaluate", "-Dexpression=project.version", "-q", "-DforceStdout");
 
-        String os = System.getProperty("os.name");
-        String commandName = "gradle";
+    File mavenDir = rootFolder.newFolder("SampleMavenProject");
+    File pom = rootFolder.newFile(mavenDir.getName() + File.separator + "pom.xml");
 
-        if (os.contains("Windows")) {
-            commandName += ".bat";
-        }
-        List<String> command = Arrays.asList(commandName, "-q", "properties");
+    String pomContent =
+        "<project>\n"
+            + " <modelVersion>4.0.0</modelVersion>\n"
+            + " <groupId>com.test.app</groupId>\n"
+            + " <artifactId>test-app</artifactId>\n"
+            + " <version>1.0.0</version>\n"
+            + "</project>\n";
 
-        File gradleDir = rootFolder.newFolder("SampleGradleProject");
-        File buildGradle = rootFolder.newFile(gradleDir.getName() + File.separator + "build.gradle");
+    FileWriter pomWriter = new FileWriter(pom);
+    pomWriter.write(pomContent);
+    pomWriter.close();
 
-        String buildGradleContent = "group 'com.sample.gradle'\n" +
-                "version = '1.0.0'\n" +
-                "\n" +
-                "apply plugin: 'java'\n" +
-                "\n" +
-                "sourceCompatibility = 1.8\n" +
-                "\n" +
-                "sourceCompatibility = 1.8\n" +
-                "targetCompatibility = 1.8";
+    assertThat(processHelper, is(notNullValue()));
+    when(processHelper.runProcessBuilder(mavenDir, command)).thenReturn("1.0.0");
 
-        FileWriter buildGradleWriter = new FileWriter(buildGradle);
-        buildGradleWriter.write(buildGradleContent);
-        buildGradleWriter.close();
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    currentVersion.setProcessHelper(processHelper);
 
-        assertThat(processHelper, is(notNullValue()));
-        when(processHelper.runProcessBuilder(gradleDir, command)).thenReturn("version: 1.0.0");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(mavenDir, "");
 
-        Version actualCurrentVersion = Version.valueOf("1.0.0");
-        CurrentVersion currentVersion = new CurrentVersion();
-        currentVersion.setProcessHelper(processHelper);
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
 
-        Version testCurrentVersion = currentVersion.getCurrentVersion(gradleDir, "");
+  @Test
+  public void testGradleProjectVersion() throws IOException, InterruptedException {
 
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
+    String os = System.getProperty("os.name");
+    String commandName = "gradle";
+
+    if (os.contains("Windows")) {
+      commandName += ".bat";
+    }
+    List<String> command = Arrays.asList(commandName, "-q", "properties");
+
+    File gradleDir = rootFolder.newFolder("SampleGradleProject");
+    File buildGradle = rootFolder.newFile(gradleDir.getName() + File.separator + "build.gradle");
+
+    String buildGradleContent =
+        "group 'com.sample.gradle'\n"
+            + "version = '1.0.0'\n"
+            + "\n"
+            + "apply plugin: 'java'\n"
+            + "\n"
+            + "sourceCompatibility = 1.8\n"
+            + "\n"
+            + "sourceCompatibility = 1.8\n"
+            + "targetCompatibility = 1.8";
+
+    FileWriter buildGradleWriter = new FileWriter(buildGradle);
+    buildGradleWriter.write(buildGradleContent);
+    buildGradleWriter.close();
+
+    assertThat(processHelper, is(notNullValue()));
+    when(processHelper.runProcessBuilder(gradleDir, command)).thenReturn("version: 1.0.0");
+
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    currentVersion.setProcessHelper(processHelper);
+
+    Version testCurrentVersion = currentVersion.getCurrentVersion(gradleDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void testMakeProjectVersion() throws IOException, InterruptedException {
+
+    File makeDir = rootFolder.newFolder("SampleMakeProject");
+    File makeFile = rootFolder.newFile(makeDir.getName() + File.separator + "Makefile");
+
+    String makeFileContent =
+        "name=sample\n" + "version=1.10.0\n" + "\n" + "build:\n" + "\techo \"hello world\" \n";
+
+    FileWriter makeFileWriter = new FileWriter(makeFile);
+    makeFileWriter.write(makeFileContent);
+    makeFileWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("1.10.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(makeDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void testNpmProjectVersion() throws IOException, InterruptedException {
+
+    File npmDir = rootFolder.newFolder("SampleNPMProject");
+    File packageJson = rootFolder.newFile(npmDir.getName() + File.separator + "package.json");
+
+    String packageJsonContent =
+        "{\"name\": \"test-project\",\n"
+            + "  \"version\": \"1.0.0\",\n"
+            + "  \"description\": \"A description\"}";
+
+    FileWriter packageJsonWriter = new FileWriter(packageJson);
+    packageJsonWriter.write(packageJsonContent);
+    packageJsonWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(npmDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void testPythonProjectVersion_SetupPyExists() throws IOException, InterruptedException {
+
+    String os = System.getProperty("os.name");
+    String commandName = "python";
+
+    if (!os.contains("Windows")) {
+      commandName += "3";
     }
 
-    @Test
-    public void testMakeProjectVersion() throws IOException, InterruptedException {
+    List<String> command = Arrays.asList(commandName, "setup.py", "--version");
 
-        File makeDir = rootFolder.newFolder("SampleMakeProject");
-        File makeFile = rootFolder.newFile(makeDir.getName() + File.separator + "Makefile");
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File setupFile = rootFolder.newFile(pyDir.getName() + File.separator + "setup.py");
+    File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
 
-        String makeFileContent = "name=sample\n" +
-                "version=1.10.0\n" +
-                "\n" +
-                "build:\n" +
-                "\techo \"hello world\" \n";
+    String setupFileContent = "from setuptools import setup\n" + "setup()";
 
-        FileWriter makeFileWriter = new FileWriter(makeFile);
-        makeFileWriter.write(makeFileContent);
-        makeFileWriter.close();
+    String setupCfgContent =
+        "[metadata]\n" + "name = sample\n" + "version = 0.1.0\n" + "author = Sample Author";
 
-        Version actualCurrentVersion = Version.valueOf("1.10.0");
-        CurrentVersion currentVersion = new CurrentVersion();
-        Version testCurrentVersion = currentVersion.getCurrentVersion(makeDir, "");
+    FileWriter setupCfgWriter = new FileWriter(setupCfg);
+    setupCfgWriter.write(setupCfgContent);
+    setupCfgWriter.close();
 
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
-    }
+    FileWriter setupFileWriter = new FileWriter(setupFile);
+    setupFileWriter.write(setupFileContent);
+    setupFileWriter.close();
 
-    @Test
-    public void testNpmProjectVersion() throws IOException, InterruptedException {
+    assertThat(processHelper, is(notNullValue()));
+    when(processHelper.runProcessBuilder(pyDir, command)).thenReturn("0.1.0");
 
-        File npmDir = rootFolder.newFolder("SampleNPMProject");
-        File packageJson = rootFolder.newFile(npmDir.getName() + File.separator + "package.json");
+    Version actualCurrentVersion = Version.valueOf("0.1.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    currentVersion.setProcessHelper(processHelper);
 
-        String packageJsonContent= "{\"name\": \"test-project\",\n" +
-                "  \"version\": \"1.0.0\",\n" +
-                "  \"description\": \"A description\"}";
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
 
-        FileWriter packageJsonWriter = new FileWriter(packageJson);
-        packageJsonWriter.write(packageJsonContent);
-        packageJsonWriter.close();
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
 
-        Version actualCurrentVersion = Version.valueOf("1.0.0");
-        CurrentVersion currentVersion = new CurrentVersion();
-        Version testCurrentVersion = currentVersion.getCurrentVersion(npmDir, "");
+  @Test
+  public void testPythonProjectVersion_SetupCfgExists() throws IOException, InterruptedException {
 
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
-    }
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
 
-    @Test
-    public void testPythonProjectVersion_SetupPyExists() throws IOException, InterruptedException {
+    String setupCfgContent =
+        "[metadata]\n" + "name = sample\n" + "version = 0.1.0\n" + "author = Sample Author";
 
-        String os = System.getProperty("os.name");
-        String commandName = "python";
+    FileWriter setupCfgWriter = new FileWriter(setupCfg);
+    setupCfgWriter.write(setupCfgContent);
+    setupCfgWriter.close();
 
-        if (!os.contains("Windows")) {
-            commandName += "3";
-        }
+    Version actualCurrentVersion = Version.valueOf("0.1.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
 
-        List<String> command = Arrays.asList(commandName, "setup.py", "--version");
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
 
-        File pyDir = rootFolder.newFolder("SamplePythonProject");
-        File setupFile = rootFolder.newFile(pyDir.getName() + File.separator + "setup.py");
-        File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
+  @Test
+  public void should_throw_npe_if_null_directory() {}
 
-        String setupFileContent = "from setuptools import setup\n" +
-                "setup()";
+  @Test
+  public void CurrentVersion_NoProjectWithTag() throws IOException, InterruptedException {
 
-        String setupCfgContent = "[metadata]\n" +
-                "name = sample\n" +
-                "version = 0.1.0\n" +
-                "author = Sample Author";
+    File testDir = rootFolder.newFolder("SampleProject");
+    Version actualCurrentVersion = Version.valueOf("0.1.0");
 
-        FileWriter setupCfgWriter = new FileWriter(setupCfg);
-        setupCfgWriter.write(setupCfgContent);
-        setupCfgWriter.close();
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "0.1.0");
 
-        FileWriter setupFileWriter = new FileWriter(setupFile);
-        setupFileWriter.write(setupFileContent);
-        setupFileWriter.close();
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
 
-        assertThat(processHelper, is(notNullValue()));
-        when(processHelper.runProcessBuilder(pyDir, command)).thenReturn("0.1.0");
+  @Test
+  public void CurrentVersion_NoProjectNoTag() throws IOException, InterruptedException {
 
-        Version actualCurrentVersion = Version.valueOf("0.1.0");
-        CurrentVersion currentVersion = new CurrentVersion();
-        currentVersion.setProcessHelper(processHelper);
+    File testDir = rootFolder.newFolder("SampleProject");
+    Version actualCurrentVersion = Version.valueOf("0.0.0");
 
-        Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "");
 
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
-    }
-
-    @Test
-    public void testPythonProjectVersion_SetupCfgExists() throws IOException, InterruptedException {
-
-        File pyDir = rootFolder.newFolder("SamplePythonProject");
-        File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
-
-        String setupCfgContent = "[metadata]\n" +
-                "name = sample\n" +
-                "version = 0.1.0\n" +
-                "author = Sample Author";
-
-        FileWriter setupCfgWriter = new FileWriter(setupCfg);
-        setupCfgWriter.write(setupCfgContent);
-        setupCfgWriter.close();
-
-        Version actualCurrentVersion = Version.valueOf("0.1.0");
-        CurrentVersion currentVersion = new CurrentVersion();
-        Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
-
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
-    }
-
-    @Test
-    public void should_throw_npe_if_null_directory() {
-
-    }
-    @Test
-    public void CurrentVersion_NoProjectWithTag() throws IOException, InterruptedException {
-
-        File testDir = rootFolder.newFolder("SampleProject");
-        Version actualCurrentVersion = Version.valueOf("0.1.0");
-
-        CurrentVersion currentVersion = new CurrentVersion();
-        Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "0.1.0");
-
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
-    }
-
-    @Test
-    public void CurrentVersion_NoProjectNoTag() throws IOException, InterruptedException {
-
-        File testDir = rootFolder.newFolder("SampleProject");
-        Version actualCurrentVersion = Version.valueOf("0.0.0");
-
-        CurrentVersion currentVersion = new CurrentVersion();
-        Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "");
-
-        assertThat(testCurrentVersion, is(notNullValue()));
-        assertThat(actualCurrentVersion, is(testCurrentVersion));
-    }
-
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
 }
