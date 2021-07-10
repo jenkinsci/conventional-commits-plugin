@@ -9,16 +9,18 @@ import java.util.List;
 
 public class DefaultProcessHelper implements ProcessHelper {
 
-    @Override
-    public String runProcessBuilder(File directory, List<String> command) throws IOException, InterruptedException {
+  @Override
+  public String runProcessBuilder(File directory, List<String> command)
+      throws IOException, InterruptedException {
 
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
-        processBuilder.directory(directory);
-        Process process = processBuilder.start();
+    ProcessBuilder processBuilder = new ProcessBuilder(command);
+    processBuilder.directory(directory);
+    Process process = processBuilder.start();
 
-        String results = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
-        process.waitFor();
+    String results = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
+    process.waitFor();
 
-        return results;
-    };
+    return results;
+  }
+  ;
 }

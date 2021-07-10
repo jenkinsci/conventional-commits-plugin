@@ -9,30 +9,27 @@ import java.io.IOException;
 
 public class CurrentVersion {
 
-    private ProcessHelper processHelper;
+  private ProcessHelper processHelper;
 
-    public void setProcessHelper(ProcessHelper processHelper) {
-        this.processHelper = processHelper;
-    }
+  public void setProcessHelper(ProcessHelper processHelper) {
+    this.processHelper = processHelper;
+  }
 
-    private Version getCurrentVersionTag(String latestTag){
-        return Version.valueOf(latestTag.isEmpty() ? "0.0.0" : latestTag);
-    }
+  private Version getCurrentVersionTag(String latestTag) {
+    return Version.valueOf(latestTag.isEmpty() ? "0.0.0" : latestTag);
+  }
 
-    public Version getCurrentVersion(File directory, String latestTag) throws IOException, InterruptedException {
+  public Version getCurrentVersion(File directory, String latestTag)
+      throws IOException, InterruptedException {
 
-        Version currentVersion;
-        ProjectType projectType = ProjectTypeFactory.getProjectType(directory);
+    Version currentVersion;
+    ProjectType projectType = ProjectTypeFactory.getProjectType(directory);
 
-        if (projectType != null) {
-            if (processHelper == null)
-                processHelper = new DefaultProcessHelper();
-            currentVersion = projectType.getCurrentVersion(directory, processHelper);
-        } else
-            currentVersion = getCurrentVersionTag(latestTag);
+    if (projectType != null) {
+      if (processHelper == null) processHelper = new DefaultProcessHelper();
+      currentVersion = projectType.getCurrentVersion(directory, processHelper);
+    } else currentVersion = getCurrentVersionTag(latestTag);
 
-        return  currentVersion;
-    }
-
-
+    return currentVersion;
+  }
 }
