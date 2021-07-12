@@ -156,9 +156,6 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void should_throw_npe_if_null_directory() {}
-
-  @Test
   public void CurrentVersion_NoProjectWithTag() throws IOException, InterruptedException {
 
     File testDir = rootFolder.newFolder("SampleProject");
