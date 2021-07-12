@@ -156,6 +156,35 @@ public class CurrentVersionTest {
   }
 
   @Test
+  public void should_read_helm_chart_current_version() throws IOException, InterruptedException {
+
+    File helmDir = rootFolder.newFolder("SampleHelmProject");
+    File chartYaml = rootFolder.newFile(helmDir.getName() + File.separator + "Chart.yaml");
+
+    String packageJsonContent =
+            "apiVersion: v2\n" +
+                    "description: Chart's description\n" +
+                    "home: https://github.com/xxx\n" +
+                    "name: xxx\n" +
+                    "version: 1.0.0\n" +
+                    "appVersion: 0.0.1\n" +
+                    "engine: gotpl\n" +
+                    "sources:\n" +
+                    "  - https://github.com/xxxx";
+
+    FileWriter chartYamlWriter = new FileWriter(chartYaml);
+    chartYamlWriter.write(packageJsonContent);
+    chartYamlWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(helmDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
   public void CurrentVersion_NoProjectWithTag() throws IOException, InterruptedException {
 
     File testDir = rootFolder.newFolder("SampleProject");
