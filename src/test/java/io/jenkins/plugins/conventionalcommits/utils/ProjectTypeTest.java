@@ -7,7 +7,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ProjectTypeTest {
 
@@ -85,5 +85,24 @@ public class ProjectTypeTest {
     ProjectType projectType = new NpmProjectType();
 
     assertEquals(false, projectType.check(npmDir));
+  }
+
+  @Test
+  public void should_is_helm_project() throws IOException {
+    File helmDir = rootFolder.newFolder("SampleHelmFolder");
+    rootFolder.newFile(helmDir.getName() + File.separator + "Chart.yaml");
+
+    ProjectType projectType = new HelmProjectType();
+
+    assertTrue(projectType.check(helmDir));
+  }
+
+  @Test
+  public void should_is_not_helm_project() throws IOException {
+    File helmDir = rootFolder.newFolder("SampleHelmFolder");
+
+    ProjectType projectType = new HelmProjectType();
+
+    assertFalse(projectType.check(helmDir));
   }
 }
