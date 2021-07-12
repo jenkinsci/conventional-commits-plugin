@@ -62,6 +62,13 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>2.12.3</version>
+            <exclusions>
+                <!-- To avoid conflict with the workflow-aggregator snakeyaml version's -->
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- test plugins for running locally via: mvn hpi:run -->
         <dependency>
