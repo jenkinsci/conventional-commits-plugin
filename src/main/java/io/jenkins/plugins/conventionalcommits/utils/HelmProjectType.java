@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class HelmProjectType extends ProjectType {
     /**
-     * TO know il the project is an Helm project type.
+     * To know if the project is an Helm project type.
      *
      * @param directory The directory to check. <b>Mandatory</b>
      * @return true if a Chart.yaml file is found.
