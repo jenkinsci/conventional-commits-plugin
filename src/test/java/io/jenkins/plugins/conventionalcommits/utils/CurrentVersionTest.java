@@ -156,6 +156,69 @@ public class CurrentVersionTest {
   }
 
   @Test
+  public void testPythonProjectVersion_SetupPyExists() throws IOException, InterruptedException {
+
+    String os = System.getProperty("os.name");
+    String commandName = "python";
+
+    if (!os.contains("Windows")) {
+      commandName += "3";
+    }
+
+    List<String> command = Arrays.asList(commandName, "setup.py", "--version");
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File setupFile = rootFolder.newFile(pyDir.getName() + File.separator + "setup.py");
+    File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
+
+    String setupFileContent = "from setuptools import setup\n" + "setup()";
+
+    String setupCfgContent =
+        "[metadata]\n" + "name = sample\n" + "version = 0.1.0\n" + "author = Sample Author";
+
+    FileWriter setupCfgWriter = new FileWriter(setupCfg);
+    setupCfgWriter.write(setupCfgContent);
+    setupCfgWriter.close();
+
+    FileWriter setupFileWriter = new FileWriter(setupFile);
+    setupFileWriter.write(setupFileContent);
+    setupFileWriter.close();
+
+    assertThat(processHelper, is(notNullValue()));
+    when(processHelper.runProcessBuilder(pyDir, command)).thenReturn("0.1.0");
+
+    Version actualCurrentVersion = Version.valueOf("0.1.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    currentVersion.setProcessHelper(processHelper);
+
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void testPythonProjectVersion_SetupCfgExists() throws IOException, InterruptedException {
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
+
+    String setupCfgContent =
+        "[metadata]\n" + "name = sample\n" + "version = 0.1.0\n" + "author = Sample Author";
+
+    FileWriter setupCfgWriter = new FileWriter(setupCfg);
+    setupCfgWriter.write(setupCfgContent);
+    setupCfgWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("0.1.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
   public void should_throw_npe_if_null_directory() {}
 
   @Test
