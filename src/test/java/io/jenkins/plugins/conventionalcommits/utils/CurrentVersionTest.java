@@ -156,7 +156,7 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void should_read_helm_chart_current_version() throws IOException, InterruptedException {
+  public void shouldReadHelmChartCurrentVersion() throws IOException, InterruptedException {
 
     File helmDir = rootFolder.newFolder("SampleHelmProject");
     File chartYaml = rootFolder.newFile(helmDir.getName() + File.separator + "Chart.yaml");

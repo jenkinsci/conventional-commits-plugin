@@ -69,7 +69,7 @@ public class ProjectTypeTest {
   }
 
   @Test
-  public void should_is_npm_project() throws IOException {
+  public void isNpmProject() throws IOException {
     File npmDir = rootFolder.newFolder("SampleNpmFolder");
     rootFolder.newFile(npmDir.getName() + File.separator + "package.json");
 
@@ -79,7 +79,7 @@ public class ProjectTypeTest {
   }
 
   @Test
-  public void should_is_not_npm_project() throws IOException {
+  public void isNotNpmProject() throws IOException {
     File npmDir = rootFolder.newFolder("SampleNpmFolder");
 
     ProjectType projectType = new NpmProjectType();
@@ -88,7 +88,7 @@ public class ProjectTypeTest {
   }
 
   @Test
-  public void should_is_helm_project() throws IOException {
+  public void isHelmProject() throws IOException {
     File helmDir = rootFolder.newFolder("SampleHelmFolder");
     rootFolder.newFile(helmDir.getName() + File.separator + "Chart.yaml");
 
@@ -98,7 +98,7 @@ public class ProjectTypeTest {
   }
 
   @Test
-  public void should_is_not_helm_project() throws IOException {
+  public void isHelmNotProject() throws IOException {
     File helmDir = rootFolder.newFolder("SampleHelmFolder");
 
     ProjectType projectType = new HelmProjectType();

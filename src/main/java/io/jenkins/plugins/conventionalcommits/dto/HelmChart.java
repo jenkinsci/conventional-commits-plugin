@@ -20,10 +20,10 @@ public class HelmChart implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        HelmChart helmChart = (HelmChart) o;
+    public boolean equals(Object anotherObject) {
+        if (this == anotherObject) return true;
+        if (anotherObject == null || getClass() != anotherObject.getClass()) return false;
+        HelmChart helmChart = (HelmChart) anotherObject;
         return Objects.equals(version, helmChart.version);
     }
 
