@@ -81,27 +81,21 @@ public class ProjectTypeTest {
   @Test
   public void isNotNpmProject() throws IOException {
     File npmDir = rootFolder.newFolder("SampleNpmFolder");
-
     ProjectType projectType = new NpmProjectType();
-
     assertEquals(false, projectType.check(npmDir));
   }
 
   @Test
   public void isPythonProject() throws IOException {
-
     File pyDir = rootFolder.newFolder("SamplePythonProject");
     rootFolder.newFile(pyDir.getName() + File.separator + "setup.py");
-
     ProjectType projectType = new PythonProjectType();
     assertEquals(true, projectType.check(pyDir));
   }
 
   @Test
   public void isNotPythonProject() throws IOException {
-
     File pyDir = rootFolder.newFolder("SamplePythonProject");
-
     ProjectType projectType = new PythonProjectType();
     assertEquals(false, projectType.check(pyDir));
   }
@@ -110,18 +104,22 @@ public class ProjectTypeTest {
   public void isHelmProject() throws IOException {
     File helmDir = rootFolder.newFolder("SampleHelmFolder");
     rootFolder.newFile(helmDir.getName() + File.separator + "Chart.yaml");
-
     ProjectType projectType = new HelmProjectType();
-
     assertTrue(projectType.check(helmDir));
   }
 
   @Test
   public void isHelmNotProject() throws IOException {
     File helmDir = rootFolder.newFolder("SampleHelmFolder");
-
     ProjectType projectType = new HelmProjectType();
-
     assertFalse(projectType.check(helmDir));
+  }
+  
+  @Test
+  public void isPythonProjectWithTOMLFile() throws IOException {
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    rootFolder.newFile(pyDir.getName() + File.separator + "pyproject.toml");
+    ProjectType projectType = new PythonProjectType();
+    assertTrue(projectType.check(pyDir));
   }
 }

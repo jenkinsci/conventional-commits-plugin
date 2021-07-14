@@ -156,7 +156,7 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void testPythonProjectVersion_SetupPyExists() throws IOException, InterruptedException {
+  public void testPythonProjectVersionSetupPyExists() throws IOException, InterruptedException {
 
     String os = System.getProperty("os.name");
     String commandName = "python";
@@ -198,7 +198,7 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void testPythonProjectVersion_SetupCfgExists() throws IOException, InterruptedException {
+  public void testPythonProjectVersionSetupCfgExists() throws IOException, InterruptedException {
 
     File pyDir = rootFolder.newFolder("SamplePythonProject");
     File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
@@ -242,6 +242,31 @@ public class CurrentVersionTest {
     Version actualCurrentVersion = Version.valueOf("1.0.0");
     CurrentVersion currentVersion = new CurrentVersion();
     Version testCurrentVersion = currentVersion.getCurrentVersion(helmDir, "");
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void testPythonProjectVersionPyProjectTOMLExists()
+      throws IOException, InterruptedException {
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File tomlFile = rootFolder.newFile(pyDir.getName() + File.separator + "pyproject.toml");
+
+    String tomlContent =
+        "[project]\n"
+            + "name = \"spam\"\n"
+            + "version = \"1.0.0\"\n"
+            + "description = \"Lovely Spam! Wonderful Spam!\"\n"
+            + "readme = \"README.rst\"";
+
+    FileWriter tomlWriter = new FileWriter(tomlFile);
+    tomlWriter.write(tomlContent);
+    tomlWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
