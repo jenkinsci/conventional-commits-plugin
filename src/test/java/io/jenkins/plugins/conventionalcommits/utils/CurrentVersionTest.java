@@ -156,7 +156,7 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void testPythonProjectVersion_SetupPyExists() throws IOException, InterruptedException {
+  public void testPythonProjectVersionSetupPyExists() throws IOException, InterruptedException {
 
     String os = System.getProperty("os.name");
     String commandName = "python";
@@ -198,7 +198,7 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void testPythonProjectVersion_SetupCfgExists() throws IOException, InterruptedException {
+  public void testPythonProjectVersionSetupCfgExists() throws IOException, InterruptedException {
 
     File pyDir = rootFolder.newFolder("SamplePythonProject");
     File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
@@ -219,7 +219,7 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void testPythonProjectVersion_PyProjectTOMLExists()
+  public void testPythonProjectVersionPyProjectTOMLExists()
       throws IOException, InterruptedException {
 
     File pyDir = rootFolder.newFolder("SamplePythonProject");

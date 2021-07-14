@@ -107,7 +107,7 @@ public class ProjectTypeTest {
   }
 
   @Test
-  public void isPythonProject_WithTOMLFile() throws IOException {
+  public void isPythonProjectWithTOMLFile() throws IOException {
 
     File pyDir = rootFolder.newFolder("SamplePythonProject");
     rootFolder.newFile(pyDir.getName() + File.separator + "pyproject.toml");
