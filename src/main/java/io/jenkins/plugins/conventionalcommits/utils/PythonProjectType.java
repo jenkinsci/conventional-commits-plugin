@@ -1,6 +1,7 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
+import io.jenkins.plugins.conventionalcommits.dto.PyProjectTOML;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 import org.apache.commons.lang.NotImplementedException;
 
@@ -11,6 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Represent a python project type. Projects any of the having following files are supported:
+ * 1. setup.py 2. setup.cfg 3. pyproject.toml
+ */
 public class PythonProjectType extends ProjectType {
 
   private boolean checkSetupPy(File directory) {
@@ -41,11 +46,11 @@ public class PythonProjectType extends ProjectType {
       commandName += "3";
     }
 
-    String results = "";
+    String result = "";
 
     if (checkSetupPy(directory)) {
       List<String> command = Arrays.asList(commandName, "setup.py", "--version");
-      results = processHelper.runProcessBuilder(directory, command).trim();
+      result = processHelper.runProcessBuilder(directory, command).trim();
     } else if (checkSetupCfg(directory)) {
 
       String filePath = directory.getAbsolutePath() + File.separator + "setup.cfg";
@@ -56,15 +61,19 @@ public class PythonProjectType extends ProjectType {
         String line = scanner.nextLine();
         if (line.toLowerCase().startsWith("version ") || line.toLowerCase().startsWith("version")) {
           String[] words = line.split("=");
-          results = words[1].trim();
+          result = words[1].trim();
           break;
         }
       }
 
     } else if (checkPyProjectTOML(directory)) {
-      throw new NotImplementedException("Support for pyproject.toml is not implemented yet.");
+      String TOMLFilePath = directory.getAbsolutePath() + File.separator + "pyproject.toml";
+      result = new PyProjectTOML().getVersion(TOMLFilePath);
+
+    } else {
+      throw new NotImplementedException("Project not supported");
     }
 
-    return Version.valueOf(results);
+    return Version.valueOf(result);
   }
 }
