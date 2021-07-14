@@ -105,4 +105,14 @@ public class ProjectTypeTest {
     ProjectType projectType = new PythonProjectType();
     assertEquals(false, projectType.check(pyDir));
   }
+
+  @Test
+  public void isPythonProject_WithTOMLFile() throws IOException {
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    rootFolder.newFile(pyDir.getName() + File.separator + "pyproject.toml");
+
+    ProjectType projectType = new PythonProjectType();
+    assertEquals(true, projectType.check(pyDir));
+  }
 }

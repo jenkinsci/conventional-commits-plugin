@@ -219,6 +219,32 @@ public class CurrentVersionTest {
   }
 
   @Test
+  public void testPythonProjectVersion_PyProjectTOMLExists()
+      throws IOException, InterruptedException {
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File tomlFile = rootFolder.newFile(pyDir.getName() + File.separator + "pyproject.toml");
+
+    String tomlContent =
+        "[project]\n"
+            + "name = \"spam\"\n"
+            + "version = \"1.0.0\"\n"
+            + "description = \"Lovely Spam! Wonderful Spam!\"\n"
+            + "readme = \"README.rst\"";
+
+    FileWriter tomlWriter = new FileWriter(tomlFile);
+    tomlWriter.write(tomlContent);
+    tomlWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
   public void should_throw_npe_if_null_directory() {}
 
   @Test
