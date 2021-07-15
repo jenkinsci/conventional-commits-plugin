@@ -156,7 +156,121 @@ public class CurrentVersionTest {
   }
 
   @Test
-  public void should_throw_npe_if_null_directory() {}
+  public void testPythonProjectVersionSetupPyExists() throws IOException, InterruptedException {
+
+    String os = System.getProperty("os.name");
+    String commandName = "python";
+
+    if (!os.contains("Windows")) {
+      commandName += "3";
+    }
+
+    List<String> command = Arrays.asList(commandName, "setup.py", "--version");
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File setupFile = rootFolder.newFile(pyDir.getName() + File.separator + "setup.py");
+    File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
+
+    String setupFileContent = "from setuptools import setup\n" + "setup()";
+
+    String setupCfgContent =
+        "[metadata]\n" + "name = sample\n" + "version = 0.1.0\n" + "author = Sample Author";
+
+    FileWriter setupCfgWriter = new FileWriter(setupCfg);
+    setupCfgWriter.write(setupCfgContent);
+    setupCfgWriter.close();
+
+    FileWriter setupFileWriter = new FileWriter(setupFile);
+    setupFileWriter.write(setupFileContent);
+    setupFileWriter.close();
+
+    assertThat(processHelper, is(notNullValue()));
+    when(processHelper.runProcessBuilder(pyDir, command)).thenReturn("0.1.0");
+
+    Version actualCurrentVersion = Version.valueOf("0.1.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    currentVersion.setProcessHelper(processHelper);
+
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void testPythonProjectVersionSetupCfgExists() throws IOException, InterruptedException {
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
+
+    String setupCfgContent =
+        "[metadata]\n" + "name = sample\n" + "version = 0.1.0\n" + "author = Sample Author";
+
+    FileWriter setupCfgWriter = new FileWriter(setupCfg);
+    setupCfgWriter.write(setupCfgContent);
+    setupCfgWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("0.1.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void shouldReadHelmChartCurrentVersion() throws IOException, InterruptedException {
+
+    File helmDir = rootFolder.newFolder("SampleHelmProject");
+    File chartYaml = rootFolder.newFile(helmDir.getName() + File.separator + "Chart.yaml");
+
+    String packageJsonContent =
+            "apiVersion: v2\n" +
+                    "description: Chart's description\n" +
+                    "home: https://github.com/xxx\n" +
+                    "name: xxx\n" +
+                    "version: 1.0.0\n" +
+                    "appVersion: 0.0.1\n" +
+                    "engine: gotpl\n" +
+                    "sources:\n" +
+                    "  - https://github.com/xxxx";
+
+    FileWriter chartYamlWriter = new FileWriter(chartYaml);
+    chartYamlWriter.write(packageJsonContent);
+    chartYamlWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(helmDir, "");
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void testPythonProjectVersionPyProjectTOMLExists()
+      throws IOException, InterruptedException {
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File tomlFile = rootFolder.newFile(pyDir.getName() + File.separator + "pyproject.toml");
+
+    String tomlContent =
+        "[project]\n"
+            + "name = \"spam\"\n"
+            + "version = \"1.0.0\"\n"
+            + "description = \"Lovely Spam! Wonderful Spam!\"\n"
+            + "readme = \"README.rst\"";
+
+    FileWriter tomlWriter = new FileWriter(tomlFile);
+    tomlWriter.write(tomlContent);
+    tomlWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("1.0.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
 
   @Test
   public void CurrentVersion_NoProjectWithTag() throws IOException, InterruptedException {

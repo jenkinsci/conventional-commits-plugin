@@ -13,6 +13,8 @@ public class ProjectTypeFactory {
     projectTypeMap.put("gradle", new GradleProjectType());
     projectTypeMap.put("make", new MakeProjectType());
     projectTypeMap.put("npm", new NpmProjectType());
+    projectTypeMap.put("python", new PythonProjectType());
+    projectTypeMap.put("helm", new HelmProjectType());
   }
 
   public static ProjectType getProjectType(File directory) {
