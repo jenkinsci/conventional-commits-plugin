@@ -2,12 +2,12 @@ package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/** Represent a Maven project type (i.e with a pom.xml file). */
 public class MavenProjectType extends ProjectType {
 
   public boolean check(File directory) {
