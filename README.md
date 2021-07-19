@@ -34,6 +34,27 @@ pipeline {
     }
 }
 ```
+### Use with prerelease information
+For a `1.0.0` existing version the following code :
+
+```
+pipeline {
+    agent any
+
+    environment {
+        NEXT_VERSION = nextVersion(prerelease: 'alpha')
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+```
+Will display :`next version = 1.1.0-alpha` 
 
 ## Issues
 
