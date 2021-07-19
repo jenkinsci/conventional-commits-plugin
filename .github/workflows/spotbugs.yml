@@ -19,3 +19,7 @@ jobs:
       - name: SpotBugs
         run: |
           mvn --no-transfer-progress spotbugs:check
+
+      - name: Javadoc
+        run: |
+          mvn --no-transfer-progress javadoc:javadoc
