@@ -8,8 +8,9 @@
 
 ## Introduction
 
-This plugin can be used to determine the next release version based on previous tags and the commit messages used.  It calculates the version number based on the
-format of the commit message.  The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+This plugin can be used to determine the next release version based on previous tags and the commit messages used.  
+It calculates the version number based on the format of the commit message.  
+The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Getting started
 
