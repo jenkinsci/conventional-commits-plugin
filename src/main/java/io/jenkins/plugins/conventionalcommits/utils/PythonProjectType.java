@@ -1,20 +1,19 @@
 package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
-import io.jenkins.plugins.conventionalcommits.dto.PyProjectTOML;
+import io.jenkins.plugins.conventionalcommits.dto.PyProjectToml;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
-import org.apache.commons.lang.NotImplementedException;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import org.apache.commons.lang.NotImplementedException;
 
 /**
- * Represent a python project type. Projects any of the having following files are supported:
- * 1. setup.py 2. setup.cfg 3. pyproject.toml
+ * Represent a python project type. Projects any of the having following files are supported: 1.
+ * setup.py 2. setup.cfg 3. pyproject.toml
  */
 public class PythonProjectType extends ProjectType {
 
@@ -26,13 +25,13 @@ public class PythonProjectType extends ProjectType {
     return new File(directory, "setup.cfg").exists();
   }
 
-  private boolean checkPyProjectTOML(File directory) {
+  private boolean checkPyProjectToml(File directory) {
     return new File(directory, "pyproject.toml").exists();
   }
 
   @Override
   public boolean check(File directory) {
-    return checkSetupCfg(directory) || checkSetupPy(directory) || checkPyProjectTOML(directory);
+    return checkSetupCfg(directory) || checkSetupPy(directory) || checkPyProjectToml(directory);
   }
 
   @Override
@@ -66,9 +65,9 @@ public class PythonProjectType extends ProjectType {
         }
       }
 
-    } else if (checkPyProjectTOML(directory)) {
-      String TOMLFilePath = directory.getAbsolutePath() + File.separator + "pyproject.toml";
-      result = new PyProjectTOML().getVersion(TOMLFilePath);
+    } else if (checkPyProjectToml(directory)) {
+      String tomlFilePath = directory.getAbsolutePath() + File.separator + "pyproject.toml";
+      result = new PyProjectToml().getVersion(tomlFilePath);
 
     } else {
       throw new NotImplementedException("Project not supported");

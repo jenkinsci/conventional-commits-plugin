@@ -1,12 +1,12 @@
 package io.jenkins.plugins.conventionalcommits.process;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
 
+/** This class runs a given command using ProcessBuilder. */
 public class DefaultProcessHelper implements ProcessHelper {
 
   @Override
@@ -22,5 +22,4 @@ public class DefaultProcessHelper implements ProcessHelper {
 
     return results;
   }
-  ;
 }

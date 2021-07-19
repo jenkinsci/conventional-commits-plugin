@@ -225,15 +225,15 @@ public class CurrentVersionTest {
     File chartYaml = rootFolder.newFile(helmDir.getName() + File.separator + "Chart.yaml");
 
     String packageJsonContent =
-            "apiVersion: v2\n" +
-                    "description: Chart's description\n" +
-                    "home: https://github.com/xxx\n" +
-                    "name: xxx\n" +
-                    "version: 1.0.0\n" +
-                    "appVersion: 0.0.1\n" +
-                    "engine: gotpl\n" +
-                    "sources:\n" +
-                    "  - https://github.com/xxxx";
+        "apiVersion: v2\n"
+            + "description: Chart's description\n"
+            + "home: https://github.com/xxx\n"
+            + "name: xxx\n"
+            + "version: 1.0.0\n"
+            + "appVersion: 0.0.1\n"
+            + "engine: gotpl\n"
+            + "sources:\n"
+            + "  - https://github.com/xxxx";
 
     FileWriter chartYamlWriter = new FileWriter(chartYaml);
     chartYamlWriter.write(packageJsonContent);

@@ -2,12 +2,12 @@ package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+/** Represent a Make project type (i.e with a Makefile). */
 public class MakeProjectType extends ProjectType {
 
   private static final String MAKEFILE_FILENAME = "Makefile";
