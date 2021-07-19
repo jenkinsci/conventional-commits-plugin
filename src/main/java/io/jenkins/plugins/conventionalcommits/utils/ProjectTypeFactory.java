@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Factory class to support multiple project types. */
 public class ProjectTypeFactory {
 
   static Map<String, ProjectType> projectTypeMap = new HashMap<>();
@@ -17,6 +18,12 @@ public class ProjectTypeFactory {
     projectTypeMap.put("helm", new HelmProjectType());
   }
 
+  /**
+   * Detects & returns the type of the project.
+   *
+   * @param directory The project's directory.
+   * @return Detected project type.
+   */
   public static ProjectType getProjectType(File directory) {
 
     ProjectType projectType = null;

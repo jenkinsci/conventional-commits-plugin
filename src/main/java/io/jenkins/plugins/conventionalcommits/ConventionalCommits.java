@@ -2,11 +2,11 @@ package io.jenkins.plugins.conventionalcommits;
 
 import com.github.zafarkhaja.semver.Version;
 import io.jenkins.plugins.conventionalcommits.utils.LogUtils;
-
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+/** Class to process conventional commit messages to get next version. */
 public class ConventionalCommits {
 
   LogUtils logger = new LogUtils();
@@ -15,6 +15,13 @@ public class ConventionalCommits {
     return commits.stream().filter(s -> !s.startsWith("Merge")).collect(Collectors.toList());
   }
 
+  /**
+   * Return the next semantic version.
+   *
+   * @param in The current semantic version.
+   * @param commits List of commit messages from the last tag.
+   * @return The next calculated version (based on Semver).
+   */
   public Version nextVersion(Version in, List<String> commits) {
     List<String> filtered = filterMergeCommits(commits);
     List<String> breaking =

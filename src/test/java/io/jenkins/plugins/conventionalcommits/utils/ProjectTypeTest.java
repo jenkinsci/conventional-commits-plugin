@@ -114,7 +114,7 @@ public class ProjectTypeTest {
     ProjectType projectType = new HelmProjectType();
     assertFalse(projectType.check(helmDir));
   }
-  
+
   @Test
   public void isPythonProjectWithTOMLFile() throws IOException {
     File pyDir = rootFolder.newFolder("SamplePythonProject");

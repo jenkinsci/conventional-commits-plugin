@@ -8,11 +8,6 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
-import org.jenkinsci.plugins.workflow.steps.*;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +16,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import org.jenkinsci.plugins.workflow.steps.Step;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
+/** Base class of the plugin. */
 public class NextVersionStep extends Step {
 
   private String outputFormat;
@@ -53,6 +57,13 @@ public class NextVersionStep extends Step {
     return stdout(process.getInputStream());
   }
 
+  /**
+   * Reads data from stdout.
+   *
+   * @param in InputStream object.
+   * @return read data.
+   * @throws IOException If an error occur reading files.
+   */
   public static String stdout(InputStream in) throws IOException {
     StringBuilder builder = new StringBuilder();
     LineReader reader = new LineReader(new InputStreamReader(in, StandardCharsets.UTF_8));
@@ -82,6 +93,7 @@ public class NextVersionStep extends Step {
     return new Execution(outputFormat, startTag, stepContext);
   }
 
+  /** This class extends Step Execution class, contains the run method. */
   public static class Execution extends SynchronousStepExecution<String> {
 
     private static final long serialVersionUID = 1L;
@@ -150,6 +162,7 @@ public class NextVersionStep extends Step {
     }
   }
 
+  /** This Class implements the abstract class StepDescriptor. */
   @Extension
   public static class DescriptorImpl extends StepDescriptor {
 
