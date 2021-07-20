@@ -19,7 +19,7 @@ public class ProjectTypeFactory {
   }
 
   /**
-   * Detects & returns the type of the project.
+   * Detects &amp; returns the type of the project.
    *
    * @param directory The project's directory.
    * @return Detected project type.
