@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
@@ -25,11 +26,15 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-/** Base class of the plugin. */
+/**
+ * Base class of the plugin.
+ */
 public class NextVersionStep extends Step {
 
   private String outputFormat;
   private String startTag;
+  // Pre release information (optional)
+  private String preRelease;
 
   @DataBoundConstructor
   public NextVersionStep() {
@@ -88,12 +93,19 @@ public class NextVersionStep extends Step {
     this.startTag = startTag;
   }
 
-  @Override
-  public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, stepContext);
+  @DataBoundSetter
+  public void setPreRelease(String preRelease) {
+    this.preRelease = preRelease;
   }
 
-  /** This class extends Step Execution class, contains the run method. */
+  @Override
+  public StepExecution start(StepContext stepContext) throws Exception {
+    return new Execution(outputFormat, startTag, preRelease, stepContext);
+  }
+
+  /**
+   * This class extends Step Execution class, contains the run method.
+   */
   public static class Execution extends SynchronousStepExecution<String> {
 
     private static final long serialVersionUID = 1L;
@@ -108,10 +120,25 @@ public class NextVersionStep extends Step {
         justification = "Only used when starting.")
     private final transient String startTag;
 
-    protected Execution(String outputFormat, String startTag, @Nonnull StepContext context) {
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    // Pre release information to add to the next version
+    private final transient String preRelease;
+
+    /**
+     * Constructor with fields initialisation.
+     * @param outputFormat Output format for the next version
+     * @param startTag Git tag
+     * @param preRelease Pre release information to add
+     * @param context Jenkins context
+     */
+    protected Execution(String outputFormat, String startTag, String preRelease,
+                        @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
+      this.preRelease = preRelease;
     }
 
     @Override
@@ -154,6 +181,11 @@ public class NextVersionStep extends Step {
         // based on the commit list, determine how to bump the version
         Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
 
+        // If pre-release information, add it
+        if (StringUtils.isNotBlank(preRelease)) {
+          nextVersion = nextVersion.setPreReleaseVersion(preRelease);
+        }
+
         // TODO write the version using the output template
         getContext().get(TaskListener.class).getLogger().println(nextVersion);
 
@@ -162,7 +194,9 @@ public class NextVersionStep extends Step {
     }
   }
 
-  /** This Class implements the abstract class StepDescriptor. */
+  /**
+   * This Class implements the abstract class StepDescriptor.
+   */
   @Extension
   public static class DescriptorImpl extends StepDescriptor {
 
