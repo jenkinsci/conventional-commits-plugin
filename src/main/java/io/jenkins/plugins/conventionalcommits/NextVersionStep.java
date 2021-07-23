@@ -128,6 +128,7 @@ public class NextVersionStep extends Step {
 
     /**
      * Constructor with fields initialisation.
+     *
      * @param outputFormat Output format for the next version
      * @param startTag Git tag
      * @param preRelease Pre release information to add
