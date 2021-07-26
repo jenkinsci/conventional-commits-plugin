@@ -43,7 +43,7 @@ pipeline {
     agent any
 
     environment {
-        NEXT_VERSION = nextVersion(prerelease: 'alpha')
+        NEXT_VERSION = nextVersion(preRelease: 'alpha')
     }
 
     stages {
@@ -70,4 +70,3 @@ Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob
 ## LICENSE
 
 Licensed under MIT, see [LICENSE](LICENSE.md)
-
