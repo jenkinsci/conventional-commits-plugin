@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
@@ -30,6 +31,7 @@ public class NextVersionStep extends Step {
 
   private String outputFormat;
   private String startTag;
+  private String buildMetadata;
 
   @DataBoundConstructor
   public NextVersionStep() {
@@ -88,9 +90,14 @@ public class NextVersionStep extends Step {
     this.startTag = startTag;
   }
 
+  @DataBoundSetter
+  public void setBuildMetadata(String buildMetadata) {
+    this.buildMetadata = buildMetadata;
+  }
+
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, stepContext);
+    return new Execution(outputFormat, startTag, buildMetadata, stepContext);
   }
 
   /** This class extends Step Execution class, contains the run method. */
@@ -108,10 +115,20 @@ public class NextVersionStep extends Step {
         justification = "Only used when starting.")
     private final transient String startTag;
 
-    protected Execution(String outputFormat, String startTag, @Nonnull StepContext context) {
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    private final String buildMetadata;
+
+    protected Execution(
+        String outputFormat,
+        String startTag,
+        String buildMetadata,
+        @Nonnull org.jenkinsci.plugins.workflow.steps.StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
+      this.buildMetadata = buildMetadata;
     }
 
     @Override
@@ -153,6 +170,10 @@ public class NextVersionStep extends Step {
 
         // based on the commit list, determine how to bump the version
         Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+
+        if (StringUtils.isNotBlank(buildMetadata)) {
+          nextVersion = nextVersion.setBuildMetadata(buildMetadata);
+        }
 
         // TODO write the version using the output template
         getContext().get(TaskListener.class).getLogger().println(nextVersion);
