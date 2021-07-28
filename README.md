@@ -47,7 +47,7 @@ The plugin provides provision to use optional parameters for support of build me
 pipeline {
     agent any
     environment {
-        NEXT_VERSION = nextVersion(buildMetadata: '001')
+        NEXT_VERSION = nextVersion(buildMetadata: "$env.BUILD_NUMBER")
     }
     stages {
         stage('Hello') {
@@ -74,4 +74,3 @@ Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob
 ## LICENSE
 
 Licensed under MIT, see [LICENSE](LICENSE.md)
-
