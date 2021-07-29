@@ -33,6 +33,7 @@ public class NextVersionStep extends Step {
 
   private String outputFormat;
   private String startTag;
+  private String buildMetadata;
   // Pre release information (optional)
   private String preRelease;
 
@@ -94,18 +95,21 @@ public class NextVersionStep extends Step {
   }
 
   @DataBoundSetter
+  public void setBuildMetadata(String buildMetadata) {
+    this.buildMetadata = buildMetadata;
+  }
+
+  @DataBoundSetter
   public void setPreRelease(String preRelease) {
     this.preRelease = preRelease;
   }
 
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, preRelease, stepContext);
+    return new Execution(outputFormat, startTag, buildMetadata, preRelease, stepContext);
   }
 
-  /**
-   * This class extends Step Execution class, contains the run method.
-   */
+  /** This class extends Step Execution class, contains the run method. */
   public static class Execution extends SynchronousStepExecution<String> {
 
     private static final long serialVersionUID = 1L;
@@ -123,6 +127,11 @@ public class NextVersionStep extends Step {
     @SuppressFBWarnings(
         value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
         justification = "Only used when starting.")
+    private final String buildMetadata;
+
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
     // Pre release information to add to the next version
     private final transient String preRelease;
 
@@ -134,11 +143,12 @@ public class NextVersionStep extends Step {
      * @param preRelease Pre release information to add
      * @param context Jenkins context
      */
-    protected Execution(String outputFormat, String startTag, String preRelease,
+    protected Execution(String outputFormat, String startTag, String buildMetadata, String preRelease,
                         @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
+      this.buildMetadata = buildMetadata;
       this.preRelease = preRelease;
     }
 
@@ -182,6 +192,10 @@ public class NextVersionStep extends Step {
         // based on the commit list, determine how to bump the version
         Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
 
+        if (StringUtils.isNotBlank(buildMetadata)) {
+          nextVersion = nextVersion.setBuildMetadata(buildMetadata);
+        }
+
         // If pre-release information, add it
         if (StringUtils.isNotBlank(preRelease)) {
           nextVersion = nextVersion.setPreReleaseVersion(preRelease);
@@ -195,9 +209,7 @@ public class NextVersionStep extends Step {
     }
   }
 
-  /**
-   * This Class implements the abstract class StepDescriptor.
-   */
+  /** This Class implements the abstract class StepDescriptor. */
   @Extension
   public static class DescriptorImpl extends StepDescriptor {
 
