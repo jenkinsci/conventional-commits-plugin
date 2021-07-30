@@ -118,7 +118,7 @@ public class NextVersionStep extends Step {
     @SuppressFBWarnings(
         value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
         justification = "Only used when starting.")
-    private final String buildMetadata;
+    private final transient String buildMetadata;
 
     protected Execution(
         String outputFormat,
