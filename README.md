@@ -43,7 +43,7 @@ pipeline {
     agent any
 
     environment {
-        NEXT_VERSION = nextVersion(prerelease: 'alpha')
+        NEXT_VERSION = nextVersion(preRelease: 'alpha')
     }
 
     stages {
@@ -56,6 +56,33 @@ pipeline {
 }
 ```
 Will display :`next version = 1.1.0-alpha` 
+
+#### Prerelease possible combinations
+There are three options to manipulate the prerelease option :
+ - the name of the prerelease :arrow_right: `preRelease`
+ - keep the existing prerelease (default **false**) :arrow_right: `preservePrelease`
+ - increment the existing prerelease (default **false**) :arrow_right: `incrementPreRelease`
+
+The table below resume the combined use of these options and the result:
+
+| current version | Breaking change commit msg | Feature commit msg | Other or empty commit msg | prerelease | preservePreRelease | incrementPreRelease	| Output              |
+| :---:           | :---:                      | :---:              | :---:                     | :---:      | :---:              | :---:                | :---:               |
+| 0.1.0           | X                          | -                  | -                         | - 	     | -                  | -                    |	**1.0.0**         |
+| 0.1.0           | -                          | X                  | -                         | - 	     | -                  | -                    |	**0.2.0**         |
+| 0.1.0           | -                          | -                  | X                         | - 	     | -                  | -                    |	**0.1.1**         |
+| 0.1.0           | X                          | -                  | -                         | alpha      | -                  | -                    |	**1.0.0-alpha**   |
+| 0.1.0           | -                          | X                  | -                         | alpha      | -                  | -                    |	**0.2.0-alpha**   |
+| 0.1.0           | -                          | -                  | X                         | alpha      | -                  | -                    |	**0.1.1-alpha**   |
+| 0.1.0-alpha     | X                          | -                  | -                         | - 	     | -                  | -                    |	**1.0.0**         |
+| 0.1.0-alpha     | -                          | X                  | -                         | - 	     | -                  | -                    |	**0.1.0**         |
+| 0.1.0-alpha     | -                          | -                  | X                         | - 	     | -                  | -                    |	**0.1.1**         |
+| 0.1.0-alpha     | X                          | -                  | -                         | - 	     | X                  | -                    |	**1.0.0-alpha**   |
+| 0.1.0-alpha     | -                          | X                  | -                         | - 	     | X                  | -                    |	**0.2.0-alpha**   |
+| 0.1.0-alpha     | -                          | -                  | X                         | - 	     | X                  | -                    |	**0.1.1-alpha**   |
+| 0.1.0-alpha     | -                          | -                  | X                         | - 	     | X                  | X                    |	**0.1.1-alpha.1** |
+| 0.1.0-alpha     | X                          | -                  | -                         | beta       | -                  | -                    |	**1.0.0-beta**    |
+| 0.1.0-alpha     | -                          | X                  | -                         | beta       | -                  | -                    |	**0.2.0-beta**    |
+| 0.1.0-alpha     | -                          | -                  | X                         | beta       | -                  | -                    |	**0.1.1-beta**    |
 
 ## Using Optional Parameters
 
