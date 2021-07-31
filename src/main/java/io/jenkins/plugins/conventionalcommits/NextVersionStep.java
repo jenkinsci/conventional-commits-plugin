@@ -26,7 +26,9 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-/** Base class of the plugin. */
+/**
+ * Base class of the plugin.
+ */
 public class NextVersionStep extends Step {
 
   private String outputFormat;
@@ -111,10 +113,13 @@ public class NextVersionStep extends Step {
 
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, buildMetadata, preRelease, preservePreRelease, stepContext);
+    return new Execution(outputFormat, startTag, buildMetadata, preRelease, preservePreRelease,
+        stepContext);
   }
 
-  /** This class extends Step Execution class, contains the run method. */
+  /**
+   * This class extends Step Execution class, contains the run method.
+   */
   public static class Execution extends SynchronousStepExecution<String> {
 
     private static final long serialVersionUID = 1L;
@@ -149,14 +154,15 @@ public class NextVersionStep extends Step {
     /**
      * Constructor with fields initialisation.
      *
-     * @param outputFormat Output format for the next version
-     * @param startTag     Git tag
-     * @param buildMetadata Add meta date to the version.
-     * @param preRelease   Pre release information to add
+     * @param outputFormat       Output format for the next version
+     * @param startTag           Git tag
+     * @param buildMetadata      Add meta date to the version.
+     * @param preRelease         Pre release information to add
      * @param preservePreRelease Keep existing prerelease information
-     * @param context      Jenkins context
+     * @param context            Jenkins context
      */
-    protected Execution(String outputFormat, String startTag, String buildMetadata, String preRelease,
+    protected Execution(String outputFormat, String startTag, String buildMetadata,
+                        String preRelease,
                         boolean preservePreRelease, @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
@@ -228,7 +234,9 @@ public class NextVersionStep extends Step {
     }
   }
 
-  /** This Class implements the abstract class StepDescriptor. */
+  /**
+   * This Class implements the abstract class StepDescriptor.
+   */
   @Extension
   public static class DescriptorImpl extends StepDescriptor {
 
