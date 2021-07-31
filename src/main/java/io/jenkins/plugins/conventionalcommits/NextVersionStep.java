@@ -35,6 +35,8 @@ public class NextVersionStep extends Step {
   private String startTag;
   // Pre release information (optional)
   private String preRelease;
+  // True to preserve in the next version the prerelease information (if set)
+  private boolean preservePreRelease;
 
   @DataBoundConstructor
   public NextVersionStep() {
@@ -98,9 +100,14 @@ public class NextVersionStep extends Step {
     this.preRelease = preRelease;
   }
 
+  @DataBoundSetter
+  public void setPreservePreRelease(boolean preservePreRelease) {
+    this.preservePreRelease = preservePreRelease;
+  }
+
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, preRelease, stepContext);
+    return new Execution(outputFormat, startTag, preRelease, preservePreRelease, stepContext);
   }
 
   /**
@@ -126,19 +133,27 @@ public class NextVersionStep extends Step {
     // Pre release information to add to the next version
     private final transient String preRelease;
 
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    // True to preserve in the next version the prerelease information (if set)
+    private final transient boolean preservePreRelease;
+
     /**
      * Constructor with fields initialisation.
+     *
      * @param outputFormat Output format for the next version
-     * @param startTag Git tag
-     * @param preRelease Pre release information to add
-     * @param context Jenkins context
+     * @param startTag     Git tag
+     * @param preRelease   Pre release information to add
+     * @param context      Jenkins context
      */
     protected Execution(String outputFormat, String startTag, String preRelease,
-                        @Nonnull StepContext context) {
+                        boolean preservePreRelease, @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
       this.preRelease = preRelease;
+      this.preservePreRelease = preservePreRelease;
     }
 
     @Override
@@ -180,6 +195,11 @@ public class NextVersionStep extends Step {
 
         // based on the commit list, determine how to bump the version
         Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+
+        if (preservePreRelease) {
+          // Set the existing prerelease
+          nextVersion = nextVersion.setPreReleaseVersion(currentVersion.getPreReleaseVersion());
+        }
 
         // If pre-release information, add it
         if (StringUtils.isNotBlank(preRelease)) {

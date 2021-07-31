@@ -1,5 +1,6 @@
 package io.jenkins.plugins.conventionalcommits;
 
+import com.github.zafarkhaja.semver.Version;
 import hudson.model.Result;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -157,4 +158,52 @@ public class JenkinsTest {
     assertThat(JenkinsRule.getLog(b), containsString("0.1.0-alpha"));
     assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
   }
+
+  @Test
+  public void shouldKeepPreReleaseInformation() throws Exception {
+    WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
+    URL zipFile = getClass().getResource("simple-project-with-prerelease-tags.zip");
+    assertThat(zipFile, is(notNullValue()));
+
+    p.setDefinition(
+        new CpsFlowDefinition(
+            "node {\n" + "  unzip '" + zipFile.getPath() + "'\n" + "\nnextVersion(preservePreRelease: true)\n" + "}\n",
+            true));
+
+    WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+
+    System.out.println(JenkinsRule.getLog(b));
+
+    assertThat(JenkinsRule.getLog(b), containsString("Started"));
+    assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
+    assertThat(JenkinsRule.getLog(b), containsString("Current Tag is: 0.2.0-alpha"));
+    assertThat(JenkinsRule.getLog(b), containsString("0.2.1-alpha"));
+    assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
+  }
+
+  @Test
+  public void shouldNotKeepPreReleaseInformation() throws Exception {
+    WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
+    URL zipFile = getClass().getResource("simple-project-with-notags.zip");
+    assertThat(zipFile, is(notNullValue()));
+
+    p.setDefinition(
+        new CpsFlowDefinition(
+            "node {\n" + "  unzip '" + zipFile.getPath() + "'\n" + "  nextVersion(preRelease: 'alpha')" +
+                "\nnextVersion()\n" + "}\n",
+            true));
+
+    WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+
+    System.out.println(JenkinsRule.getLog(b));
+
+    assertThat(JenkinsRule.getLog(b), containsString("Started"));
+    assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
+    assertThat(JenkinsRule.getLog(b), containsString("No tags found"));
+    assertThat(JenkinsRule.getLog(b), containsString("0.1.0-alpha"));
+    assertThat(JenkinsRule.getLog(b), containsString("0.1.0"));
+    assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
+  }
+
+
 }
