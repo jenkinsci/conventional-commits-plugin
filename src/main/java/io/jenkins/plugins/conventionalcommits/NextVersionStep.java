@@ -26,9 +26,7 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-/**
- * Base class of the plugin.
- */
+/** Base class of the plugin. */
 public class NextVersionStep extends Step {
 
   private String outputFormat;
@@ -37,6 +35,7 @@ public class NextVersionStep extends Step {
   private String preRelease;
   // True to preserve in the next version the prerelease information (if set)
   private boolean preservePreRelease;
+  private String buildMetadata;
 
   @DataBoundConstructor
   public NextVersionStep() {
@@ -96,6 +95,11 @@ public class NextVersionStep extends Step {
   }
 
   @DataBoundSetter
+  public void setBuildMetadata(String buildMetadata) {
+    this.buildMetadata = buildMetadata;
+  }
+
+  @DataBoundSetter
   public void setPreRelease(String preRelease) {
     this.preRelease = preRelease;
   }
@@ -107,12 +111,10 @@ public class NextVersionStep extends Step {
 
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, preRelease, preservePreRelease, stepContext);
+    return new Execution(outputFormat, startTag, buildMetadata, preRelease, preservePreRelease, stepContext);
   }
 
-  /**
-   * This class extends Step Execution class, contains the run method.
-   */
+  /** This class extends Step Execution class, contains the run method. */
   public static class Execution extends SynchronousStepExecution<String> {
 
     private static final long serialVersionUID = 1L;
@@ -126,6 +128,11 @@ public class NextVersionStep extends Step {
         value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
         justification = "Only used when starting.")
     private final transient String startTag;
+
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    private final transient String buildMetadata;
 
     @SuppressFBWarnings(
         value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
@@ -144,16 +151,19 @@ public class NextVersionStep extends Step {
      *
      * @param outputFormat Output format for the next version
      * @param startTag     Git tag
+     * @param buildMetadata Add meta date to the version.
      * @param preRelease   Pre release information to add
+     * @param preservePreRelease Keep existing prerelease information
      * @param context      Jenkins context
      */
-    protected Execution(String outputFormat, String startTag, String preRelease,
+    protected Execution(String outputFormat, String startTag, String buildMetadata, String preRelease,
                         boolean preservePreRelease, @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
       this.preRelease = preRelease;
       this.preservePreRelease = preservePreRelease;
+      this.buildMetadata = buildMetadata;
     }
 
     @Override
@@ -196,6 +206,10 @@ public class NextVersionStep extends Step {
         // based on the commit list, determine how to bump the version
         Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
 
+        if (StringUtils.isNotBlank(buildMetadata)) {
+          nextVersion = nextVersion.setBuildMetadata(buildMetadata);
+        }
+
         if (preservePreRelease) {
           // Set the existing prerelease
           nextVersion = nextVersion.setPreReleaseVersion(currentVersion.getPreReleaseVersion());
@@ -214,9 +228,7 @@ public class NextVersionStep extends Step {
     }
   }
 
-  /**
-   * This Class implements the abstract class StepDescriptor.
-   */
+  /** This Class implements the abstract class StepDescriptor. */
   @Extension
   public static class DescriptorImpl extends StepDescriptor {
 

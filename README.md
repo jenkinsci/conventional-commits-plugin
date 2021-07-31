@@ -57,6 +57,32 @@ pipeline {
 ```
 Will display :`next version = 1.1.0-alpha` 
 
+## Using Optional Parameters
+
+The plugin provides provision to use optional parameters for support of build metadata, pre-release information, settnig the start tag, etc.
+
+### Build Metadata 
+
+`buildMetadata` an optional parameter can be added as follows:
+
+```
+pipeline {
+    agent any
+    environment {
+        NEXT_VERSION = nextVersion(buildMetadata: "$env.BUILD_NUMBER")
+    }
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+```
+Assuming next version is `1.1.0`.
+The pipeline will output :`next version = 1.1.0+001`
+
 ## Issues
 
 Report issues and enhancements in the [Github issue tracker](https://github.com/jenkinsci/conventional-commits/issues).
@@ -70,4 +96,3 @@ Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob
 ## LICENSE
 
 Licensed under MIT, see [LICENSE](LICENSE.md)
-
