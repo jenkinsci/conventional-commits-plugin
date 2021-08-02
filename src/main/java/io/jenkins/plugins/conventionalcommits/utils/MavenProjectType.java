@@ -32,4 +32,21 @@ public class MavenProjectType extends ProjectType {
 
     return Version.valueOf(results);
   }
+
+  @Override
+  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
+      throws IOException, InterruptedException {
+
+    String os = System.getProperty("os.name");
+    String commandName = "mvn";
+
+    if (os.contains("Windows")) {
+      commandName += ".cmd";
+    }
+
+    List<String> command =
+        Arrays.asList(
+            commandName, "versions:set", "-DnewVersion=" + nextVersion.toString());
+    processHelper.runProcessBuilder(directory, command);
+  }
 }

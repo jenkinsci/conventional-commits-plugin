@@ -75,4 +75,8 @@ public class PythonProjectType extends ProjectType {
 
     return Version.valueOf(result);
   }
+
+  @Override
+  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
+      throws IOException, InterruptedException {}
 }

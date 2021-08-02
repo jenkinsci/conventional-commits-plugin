@@ -41,4 +41,8 @@ public class MakeProjectType extends ProjectType {
 
     return Version.valueOf(results);
   }
+
+  @Override
+  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
+      throws IOException, InterruptedException {}
 }

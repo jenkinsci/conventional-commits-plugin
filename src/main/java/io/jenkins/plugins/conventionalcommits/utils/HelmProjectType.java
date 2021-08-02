@@ -49,4 +49,8 @@ public class HelmProjectType extends ProjectType {
             HelmChart.class);
     return Version.valueOf(chart.getVersion());
   }
+
+  @Override
+  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
+      throws IOException, InterruptedException {}
 }
