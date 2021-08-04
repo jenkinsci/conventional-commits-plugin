@@ -167,13 +167,13 @@ public class NextVersionStep extends Step {
     /**
      * Constructor with fields initialisation.
      *
-     * @param outputFormat       Output format for the next version
-     * @param startTag           Git tag
-     * @param buildMetadata      Add meta date to the version.
-     * @param preRelease         Pre release information to add
-     * @param preservePreRelease Keep existing prerelease information or not
+     * @param outputFormat        Output format for the next version
+     * @param startTag            Git tag
+     * @param buildMetadata       Add meta date to the version.
+     * @param preRelease          Pre release information to add
+     * @param preservePreRelease  Keep existing prerelease information or not
      * @param incrementPreRelease Increment prerelease information or not
-     * @param context            Jenkins context
+     * @param context             Jenkins context
      */
     protected Execution(String outputFormat, String startTag, String buildMetadata,
                         String preRelease, boolean preservePreRelease, boolean incrementPreRelease,
@@ -224,7 +224,7 @@ public class NextVersionStep extends Step {
 
         List<String> commitHistory = Arrays.asList(commitMessagesString.split("\n"));
 
-        Version nextVersion = null;
+        Version nextVersion;
         if (!incrementPreRelease) {
           // based on the commit list, determine how to bump the version
           nextVersion =
@@ -237,9 +237,16 @@ public class NextVersionStep extends Step {
           nextVersion = nextVersion.setBuildMetadata(buildMetadata);
         }
 
-        if (preservePreRelease) {
-          // Set the existing prerelease
-          nextVersion = nextVersion.setPreReleaseVersion(currentVersion.getPreReleaseVersion());
+
+        // Keep (or not) the pre-release information only if incrementPreRelease is not set
+        if (!incrementPreRelease && StringUtils.isNotBlank(currentVersion.getPreReleaseVersion())) {
+          if (preservePreRelease) {
+            nextVersion = nextVersion.setPreReleaseVersion(currentVersion.getPreReleaseVersion());
+          } else {
+            if (!StringUtils.isNotBlank(preRelease)) {
+              nextVersion = Version.valueOf(currentVersion.getNormalVersion());
+            }
+          }
         }
 
         // If pre-release information, add it
