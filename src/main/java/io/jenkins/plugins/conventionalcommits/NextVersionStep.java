@@ -162,8 +162,7 @@ public class NextVersionStep extends Step {
      * @param context            Jenkins context
      */
     protected Execution(String outputFormat, String startTag, String buildMetadata,
-                        String preRelease,
-                        boolean preservePreRelease, @Nonnull StepContext context) {
+                        String preRelease, boolean preservePreRelease, @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
