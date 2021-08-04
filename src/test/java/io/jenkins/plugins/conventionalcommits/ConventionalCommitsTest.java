@@ -160,17 +160,4 @@ public class ConventionalCommitsTest {
     assertThat(out.toString(), is("0.1.0"));
   }
 
-  @Test
-  public void willBumpMinorVersionWithPrerelease() {
-    ConventionalCommits cc = new ConventionalCommits();
-    Version out =
-        cc.nextVersion(
-            Version.valueOf("0.1.0"),
-            Arrays.asList(
-                "feat: add new feature",
-                "feat: add another feature"));
-
-    assertThat(out, is(notNullValue()));
-    assertThat(out.toString(), is("0.1.0"));
-  }
 }
