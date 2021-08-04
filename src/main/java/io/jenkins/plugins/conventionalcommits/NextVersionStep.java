@@ -37,6 +37,8 @@ public class NextVersionStep extends Step {
   private String preRelease;
   // True to preserve in the next version the prerelease information (if set)
   private boolean preservePreRelease;
+  // True to increment prerelease information instead of the version itself
+  private boolean incrementPreRelease;
   private String buildMetadata;
 
   @DataBoundConstructor
@@ -111,10 +113,15 @@ public class NextVersionStep extends Step {
     this.preservePreRelease = preservePreRelease;
   }
 
+  @DataBoundSetter
+  public void setIncrementPreRelease(boolean incrementPreRelease) {
+    this.incrementPreRelease = incrementPreRelease;
+  }
+
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
     return new Execution(outputFormat, startTag, buildMetadata, preRelease, preservePreRelease,
-        stepContext);
+        incrementPreRelease, stepContext);
   }
 
   /**
@@ -151,6 +158,12 @@ public class NextVersionStep extends Step {
     // True to preserve in the next version the prerelease information (if set)
     private final transient boolean preservePreRelease;
 
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    // True to increment prerelease information instead of the version itself
+    private final transient boolean incrementPreRelease;
+
     /**
      * Constructor with fields initialisation.
      *
@@ -158,17 +171,20 @@ public class NextVersionStep extends Step {
      * @param startTag           Git tag
      * @param buildMetadata      Add meta date to the version.
      * @param preRelease         Pre release information to add
-     * @param preservePreRelease Keep existing prerelease information
+     * @param preservePreRelease Keep existing prerelease information or not
+     * @param incrementPreRelease Increment prerelease information or not
      * @param context            Jenkins context
      */
     protected Execution(String outputFormat, String startTag, String buildMetadata,
-                        String preRelease, boolean preservePreRelease, @Nonnull StepContext context) {
+                        String preRelease, boolean preservePreRelease, boolean incrementPreRelease,
+                        @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
+      this.buildMetadata = buildMetadata;
       this.preRelease = preRelease;
       this.preservePreRelease = preservePreRelease;
-      this.buildMetadata = buildMetadata;
+      this.incrementPreRelease = incrementPreRelease;
     }
 
     @Override
@@ -208,8 +224,14 @@ public class NextVersionStep extends Step {
 
         List<String> commitHistory = Arrays.asList(commitMessagesString.split("\n"));
 
-        // based on the commit list, determine how to bump the version
-        Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+        Version nextVersion = null;
+        if (!incrementPreRelease) {
+          // based on the commit list, determine how to bump the version
+          nextVersion =
+              new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+        } else {
+          nextVersion = currentVersion.incrementPreReleaseVersion();
+        }
 
         if (StringUtils.isNotBlank(buildMetadata)) {
           nextVersion = nextVersion.setBuildMetadata(buildMetadata);

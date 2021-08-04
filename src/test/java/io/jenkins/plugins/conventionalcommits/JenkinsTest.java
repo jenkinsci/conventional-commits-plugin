@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.github.zafarkhaja.semver.Version;
 import hudson.model.Result;
 import java.net.URL;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -318,6 +317,30 @@ public class JenkinsTest {
     assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
     assertThat(JenkinsRule.getLog(b), containsString("Current Tag is: 0.2.0-alpha"));
     assertThat(JenkinsRule.getLog(b), containsString("0.2.1-beta"));
+    assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
+  }
+
+  @Test
+  public void shouldIncrementPreReleaseInformation() throws Exception {
+    WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
+    // Tag : 0.2.0-alpha / No commit msg
+    URL zipFile = getClass().getResource("simple-project-with-prerelease-tags.zip");
+    assertThat(zipFile, is(notNullValue()));
+
+    p.setDefinition(
+        new CpsFlowDefinition(
+            "node {\n" + "  unzip '" + zipFile.getPath() + "'\n" +
+                "\nnextVersion(incrementPreRelease: true)\n" + "}\n",
+            true));
+
+    WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+
+    System.out.println(JenkinsRule.getLog(b));
+
+    assertThat(JenkinsRule.getLog(b), containsString("Started"));
+    assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
+    assertThat(JenkinsRule.getLog(b), containsString("Current Tag is: 0.2.0-alpha"));
+    assertThat(JenkinsRule.getLog(b), containsString("0.2.0-alpha.1"));
     assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
   }
 }
