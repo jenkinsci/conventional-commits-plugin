@@ -8,6 +8,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
+import io.jenkins.plugins.conventionalcommits.utils.WriteVersion;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ public class NextVersionStep extends Step {
   private String outputFormat;
   private String startTag;
   private String buildMetadata;
+  private boolean writeVersion;
 
   @DataBoundConstructor
   public NextVersionStep() {
@@ -95,9 +97,14 @@ public class NextVersionStep extends Step {
     this.buildMetadata = buildMetadata;
   }
 
+  @DataBoundSetter
+  public void setWriteVersion(boolean writeVersion) {
+    this.writeVersion = writeVersion;
+  }
+
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, buildMetadata, stepContext);
+    return new Execution(outputFormat, startTag, buildMetadata, writeVersion, stepContext);
   }
 
   /** This class extends Step Execution class, contains the run method. */
@@ -120,15 +127,22 @@ public class NextVersionStep extends Step {
         justification = "Only used when starting.")
     private final transient String buildMetadata;
 
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    private final transient boolean writeVersion;
+
     protected Execution(
         String outputFormat,
         String startTag,
         String buildMetadata,
+        boolean writeVersion,
         @Nonnull org.jenkinsci.plugins.workflow.steps.StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
       this.buildMetadata = buildMetadata;
+      this.writeVersion = writeVersion;
     }
 
     @Override
@@ -175,7 +189,11 @@ public class NextVersionStep extends Step {
           nextVersion = nextVersion.setBuildMetadata(buildMetadata);
         }
 
-        // TODO write the version using the output template
+        if (writeVersion) {
+          WriteVersion writer = new WriteVersion();
+          writer.write(nextVersion, dir);
+        }
+
         getContext().get(TaskListener.class).getLogger().println(nextVersion);
 
         return nextVersion.toString();
