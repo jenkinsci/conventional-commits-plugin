@@ -40,4 +40,8 @@ public class GradleProjectType extends ProjectType {
     }
     return Version.valueOf(version);
   }
+
+  @Override
+  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
+      throws IOException, InterruptedException {}
 }

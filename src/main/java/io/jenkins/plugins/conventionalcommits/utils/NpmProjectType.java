@@ -47,4 +47,7 @@ public class NpmProjectType extends ProjectType {
 
     return Version.valueOf((String) map.get("version"));
   }
+
+  @Override
+  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper) {}
 }

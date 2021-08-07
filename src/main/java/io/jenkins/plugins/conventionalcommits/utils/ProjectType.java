@@ -11,4 +11,8 @@ abstract class ProjectType {
 
   public abstract Version getCurrentVersion(File directory, ProcessHelper processHelper)
       throws IOException, InterruptedException;
+
+  public abstract void writeVersion(
+      File directory, Version nextVersion, ProcessHelper processHelper)
+      throws IOException, InterruptedException;
 }

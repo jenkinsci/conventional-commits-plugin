@@ -8,6 +8,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
+import io.jenkins.plugins.conventionalcommits.utils.WriteVersion;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,9 +27,7 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-/**
- * Base class of the plugin.
- */
+/** Base class of the plugin. */
 public class NextVersionStep extends Step {
 
   private String outputFormat;
@@ -40,6 +39,7 @@ public class NextVersionStep extends Step {
   // True to increment prerelease information instead of the version itself
   private boolean incrementPreRelease;
   private String buildMetadata;
+  private boolean writeVersion;
 
   @DataBoundConstructor
   public NextVersionStep() {
@@ -104,6 +104,11 @@ public class NextVersionStep extends Step {
   }
 
   @DataBoundSetter
+  public void setWriteVersion(boolean writeVersion) {
+    this.writeVersion = writeVersion;
+  }
+
+  @DataBoundSetter
   public void setPreRelease(String preRelease) {
     this.preRelease = preRelease;
   }
@@ -120,13 +125,11 @@ public class NextVersionStep extends Step {
 
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, buildMetadata, preRelease, preservePreRelease,
+    return new Execution(outputFormat, startTag, buildMetadata, writeVersion, preRelease, preservePreRelease,
         incrementPreRelease, stepContext);
   }
 
-  /**
-   * This class extends Step Execution class, contains the run method.
-   */
+  /** This class extends Step Execution class, contains the run method. */
   public static class Execution extends SynchronousStepExecution<String> {
 
     private static final long serialVersionUID = 1L;
@@ -145,6 +148,11 @@ public class NextVersionStep extends Step {
         value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
         justification = "Only used when starting.")
     private final transient String buildMetadata;
+
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    private final transient boolean writeVersion;
 
     @SuppressFBWarnings(
         value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
@@ -170,18 +178,20 @@ public class NextVersionStep extends Step {
      * @param outputFormat        Output format for the next version
      * @param startTag            Git tag
      * @param buildMetadata       Add meta date to the version.
+     * @param writeVersion        Should write the new version in the file.
      * @param preRelease          Pre release information to add
      * @param preservePreRelease  Keep existing prerelease information or not
      * @param incrementPreRelease Increment prerelease information or not
      * @param context             Jenkins context
      */
-    protected Execution(String outputFormat, String startTag, String buildMetadata,
+    protected Execution(String outputFormat, String startTag, String buildMetadata, boolean writeVersion,
                         String preRelease, boolean preservePreRelease, boolean incrementPreRelease,
                         @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
       this.buildMetadata = buildMetadata;
+      this.writeVersion = writeVersion;
       this.preRelease = preRelease;
       this.preservePreRelease = preservePreRelease;
       this.incrementPreRelease = incrementPreRelease;
@@ -237,7 +247,6 @@ public class NextVersionStep extends Step {
           nextVersion = nextVersion.setBuildMetadata(buildMetadata);
         }
 
-
         // Keep (or not) the pre-release information only if incrementPreRelease is not set
         if (!incrementPreRelease && StringUtils.isNotBlank(currentVersion.getPreReleaseVersion())) {
           if (preservePreRelease) {
@@ -254,7 +263,11 @@ public class NextVersionStep extends Step {
           nextVersion = nextVersion.setPreReleaseVersion(preRelease);
         }
 
-        // TODO write the version using the output template
+        if (writeVersion) {
+          WriteVersion writer = new WriteVersion();
+          writer.write(nextVersion, dir);
+        }
+
         getContext().get(TaskListener.class).getLogger().println(nextVersion);
 
         return nextVersion.toString();
@@ -262,9 +275,7 @@ public class NextVersionStep extends Step {
     }
   }
 
-  /**
-   * This Class implements the abstract class StepDescriptor.
-   */
+  /** This Class implements the abstract class StepDescriptor. */
   @Extension
   public static class DescriptorImpl extends StepDescriptor {
 
