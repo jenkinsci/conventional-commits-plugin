@@ -125,8 +125,8 @@ public class NextVersionStep extends Step {
 
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, buildMetadata, writeVersion, preRelease, preservePreRelease,
-        incrementPreRelease, stepContext);
+    return new Execution(outputFormat, startTag, buildMetadata, writeVersion, preRelease,
+        preservePreRelease, incrementPreRelease, stepContext);
   }
 
   /** This class extends Step Execution class, contains the run method. */
@@ -184,9 +184,9 @@ public class NextVersionStep extends Step {
      * @param incrementPreRelease Increment prerelease information or not
      * @param context             Jenkins context
      */
-    protected Execution(String outputFormat, String startTag, String buildMetadata, boolean writeVersion,
-                        String preRelease, boolean preservePreRelease, boolean incrementPreRelease,
-                        @Nonnull StepContext context) {
+    protected Execution(String outputFormat, String startTag, String buildMetadata,
+                        boolean writeVersion, String preRelease, boolean preservePreRelease,
+                        boolean incrementPreRelease, @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
