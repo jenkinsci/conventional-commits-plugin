@@ -235,7 +235,7 @@ public class NextVersionStep extends Step {
         List<String> commitHistory = Arrays.asList(commitMessagesString.split("\n"));
 
         Version nextVersion;
-        if (!incrementPreRelease) {
+        if (!incrementPreRelease || StringUtils.isEmpty(currentVersion.getPreReleaseVersion())) {
           // based on the commit list, determine how to bump the version
           nextVersion =
               new ConventionalCommits().nextVersion(currentVersion, commitHistory);
