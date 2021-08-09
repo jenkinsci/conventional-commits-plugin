@@ -8,8 +8,9 @@
 
 ## Introduction
 
-This plugin can be used to determine the next release version based on previous tags and the commit messages used.  It calculates the version number based on the
-format of the commit message.  The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+This plugin can be used to determine the next release version based on previous tags and the commit messages used.  
+It calculates the version number based on the format of the commit message.  
+The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Getting started
 
@@ -60,6 +61,56 @@ pipeline {
 ```
 Assuming next version is `1.1.0`.
 The pipeline will output :`next version = 1.1.0+001`
+
+### Use with prerelease information
+For a `1.0.0` existing version the following code :
+
+```
+pipeline {
+    agent any
+
+    environment {
+        NEXT_VERSION = nextVersion(preRelease: 'alpha')
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+```
+Will display :`next version = 1.1.0-alpha`
+
+#### Prerelease possible combinations
+There are three options to manipulate the prerelease option :
+- the name of the prerelease :arrow_right: `preRelease`
+- keep the existing prerelease (default **false**) :arrow_right: `preservePrelease`
+- increment the existing prerelease (default **false**) :arrow_right: `incrementPreRelease`
+
+The table below resume the combined use of these options and the result:
+
+| current version | Breaking change commit msg | Feature commit msg | Other or empty commit msg | prerelease | preservePreRelease | incrementPreRelease	| Output              |
+| :---:           | :---:                      | :---:              | :---:                     | :---:      | :---:              | :---:                | :---:               |
+| 0.1.0           | X                          | -                  | -                         | - 	     | -                  | -                    |	**1.0.0**         |
+| 0.1.0           | -                          | X                  | -                         | - 	     | -                  | -                    |	**0.2.0**         |
+| 0.1.0           | -                          | -                  | X                         | - 	     | -                  | -                    |	**0.1.1**         |
+| 0.1.0           | X                          | -                  | -                         | alpha      | -                  | -                    |	**1.0.0-alpha**   |
+| 0.1.0           | -                          | X                  | -                         | alpha      | -                  | -                    |	**0.2.0-alpha**   |
+| 0.1.0           | -                          | -                  | X                         | alpha      | -                  | -                    |	**0.1.1-alpha**   |
+| 1.0.0-alpha     | -                          | -                  | -                         | - 	     | -                  | -                    |	**1.0.0**         |
+| 0.1.0-alpha     | -                          | -                  | -                         | - 	     | -                  | -                    |	**0.1.0**         |
+| 0.1.1-alpha     | -                          | -                  | -                         | - 	     | -                  | -                    |	**0.1.1**         |
+| 0.1.0-alpha     | X                          | -                  | -                         | - 	     | X                  | -                    |	**1.0.0-alpha**   |
+| 0.1.0-alpha     | -                          | X                  | -                         | - 	     | X                  | -                    |	**0.2.0-alpha**   |
+| 0.1.0-alpha     | -                          | -                  | X                         | - 	     | X                  | -                    |	**0.1.1-alpha**   |
+| 0.1.0-alpha     | -                          | -                  | X                         | - 	     | X                  | X                    |	**0.1.1-alpha.1** |
+| 0.1.0-alpha     | X                          | -                  | -                         | beta       | -                  | -                    |	**1.0.0-beta**    |
+| 0.1.0-alpha     | -                          | X                  | -                         | beta       | -                  | -                    |	**0.2.0-beta**    |
+| 0.1.0-alpha     | -                          | -                  | X                         | beta       | -                  | -                    |	**0.1.1-beta**    |
+
 
 ## Issues
 
