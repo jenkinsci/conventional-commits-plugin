@@ -159,4 +159,5 @@ public class ConventionalCommitsTest {
     assertThat(out, is(notNullValue()));
     assertThat(out.toString(), is("0.1.0"));
   }
+
 }
