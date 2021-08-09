@@ -32,6 +32,12 @@ public class NextVersionStep extends Step {
 
   private String outputFormat;
   private String startTag;
+  // Pre release information (optional)
+  private String preRelease;
+  // True to preserve in the next version the prerelease information (if set)
+  private boolean preservePreRelease;
+  // True to increment prerelease information instead of the version itself
+  private boolean incrementPreRelease;
   private String buildMetadata;
   private boolean writeVersion;
 
@@ -102,9 +108,25 @@ public class NextVersionStep extends Step {
     this.writeVersion = writeVersion;
   }
 
+  @DataBoundSetter
+  public void setPreRelease(String preRelease) {
+    this.preRelease = preRelease;
+  }
+
+  @DataBoundSetter
+  public void setPreservePreRelease(boolean preservePreRelease) {
+    this.preservePreRelease = preservePreRelease;
+  }
+
+  @DataBoundSetter
+  public void setIncrementPreRelease(boolean incrementPreRelease) {
+    this.incrementPreRelease = incrementPreRelease;
+  }
+
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, buildMetadata, writeVersion, stepContext);
+    return new Execution(outputFormat, startTag, buildMetadata, writeVersion, preRelease,
+        preservePreRelease, incrementPreRelease, stepContext);
   }
 
   /** This class extends Step Execution class, contains the run method. */
@@ -132,17 +154,47 @@ public class NextVersionStep extends Step {
         justification = "Only used when starting.")
     private final transient boolean writeVersion;
 
-    protected Execution(
-        String outputFormat,
-        String startTag,
-        String buildMetadata,
-        boolean writeVersion,
-        @Nonnull org.jenkinsci.plugins.workflow.steps.StepContext context) {
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    // Pre release information to add to the next version
+    private final transient String preRelease;
+
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    // True to preserve in the next version the prerelease information (if set)
+    private final transient boolean preservePreRelease;
+
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    // True to increment prerelease information instead of the version itself
+    private final transient boolean incrementPreRelease;
+
+    /**
+     * Constructor with fields initialisation.
+     *
+     * @param outputFormat        Output format for the next version
+     * @param startTag            Git tag
+     * @param buildMetadata       Add meta date to the version.
+     * @param writeVersion        Should write the new version in the file.
+     * @param preRelease          Pre release information to add
+     * @param preservePreRelease  Keep existing prerelease information or not
+     * @param incrementPreRelease Increment prerelease information or not
+     * @param context             Jenkins context
+     */
+    protected Execution(String outputFormat, String startTag, String buildMetadata,
+                        boolean writeVersion, String preRelease, boolean preservePreRelease,
+                        boolean incrementPreRelease, @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
       this.buildMetadata = buildMetadata;
       this.writeVersion = writeVersion;
+      this.preRelease = preRelease;
+      this.preservePreRelease = preservePreRelease;
+      this.incrementPreRelease = incrementPreRelease;
     }
 
     @Override
@@ -182,11 +234,33 @@ public class NextVersionStep extends Step {
 
         List<String> commitHistory = Arrays.asList(commitMessagesString.split("\n"));
 
-        // based on the commit list, determine how to bump the version
-        Version nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+        Version nextVersion;
+        if (!incrementPreRelease || StringUtils.isEmpty(currentVersion.getPreReleaseVersion())) {
+          // based on the commit list, determine how to bump the version
+          nextVersion =
+              new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+        } else {
+          nextVersion = currentVersion.incrementPreReleaseVersion();
+        }
 
         if (StringUtils.isNotBlank(buildMetadata)) {
           nextVersion = nextVersion.setBuildMetadata(buildMetadata);
+        }
+
+        // Keep (or not) the pre-release information only if incrementPreRelease is not set
+        if (!incrementPreRelease && StringUtils.isNotBlank(currentVersion.getPreReleaseVersion())) {
+          if (preservePreRelease) {
+            nextVersion = nextVersion.setPreReleaseVersion(currentVersion.getPreReleaseVersion());
+          } else {
+            if (!StringUtils.isNotBlank(preRelease)) {
+              nextVersion = Version.valueOf(currentVersion.getNormalVersion());
+            }
+          }
+        }
+
+        // If pre-release information, add it
+        if (StringUtils.isNotBlank(preRelease)) {
+          nextVersion = nextVersion.setPreReleaseVersion(preRelease);
         }
 
         if (writeVersion) {
