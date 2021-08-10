@@ -23,9 +23,11 @@ public class WriteVersion {
    * @throws IOException If an error occurs while reading/writing files.
    * @throws InterruptedException If an error occurs while executing command using processHelper.
    */
-  public void write(Version nextVersion, File directory) throws IOException, InterruptedException {
+  public String write(Version nextVersion, File directory)
+      throws IOException, InterruptedException {
 
     ProjectType projectType = ProjectTypeFactory.getProjectType(directory);
+    String message = "The next version was written to the configuration file.";
 
     if (projectType != null) {
       if (processHelper == null) {
@@ -33,8 +35,10 @@ public class WriteVersion {
       }
       projectType.writeVersion(directory, nextVersion, processHelper);
     } else {
+      message = "Could not write the next version to the configuration file.";
       LogUtils logger = new LogUtils();
-      logger.log(Level.INFO, Level.INFO, Level.FINE, Level.FINE, true, "Could not write to file");
+      logger.log(Level.INFO, Level.INFO, Level.FINE, Level.FINE, true, message);
     }
+    return message;
   }
 }

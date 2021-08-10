@@ -9,13 +9,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,6 +28,8 @@ public class WriteVersionTest {
   @Rule public TemporaryFolder rootFolder = new TemporaryFolder();
 
   @Mock private ProcessHelper processHelper;
+
+  @Captor private ArgumentCaptor<ArrayList<String>> captor;
 
   @Test
   public void testWriteMavenProjectVersion() throws IOException, InterruptedException {
@@ -59,5 +64,19 @@ public class WriteVersionTest {
     WriteVersion writer = new WriteVersion();
     writer.setProcessHelper(processHelper);
     writer.write(Version.valueOf("2.0.0"), mavenDir);
+
+    verify(processHelper).runProcessBuilder(any(), captor.capture());
+    List<String> capturedCommand = captor.getValue();
+    assertThat(capturedCommand, is(command));
+  }
+
+  @Test
+  public void testWriteVersionFailed() throws IOException, InterruptedException {
+
+    File dir = rootFolder.newFolder("SampleProject");
+
+    WriteVersion writer = new WriteVersion();
+    writer.write(Version.valueOf("1.0.0"), dir);
+    // FIXME: Check if logger was called
   }
 }

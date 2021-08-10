@@ -394,4 +394,62 @@ public class JenkinsTest {
     assertThat(JenkinsRule.getLog(b), containsString("0.1.0"));
     assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
   }
+
+  @Test
+  public void shouldWriteVersion() throws Exception {
+    WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
+    URL zipFile = getClass().getResource("simple-maven-project-with-notags.zip");
+    assertThat(zipFile, is(notNullValue()));
+
+    p.setDefinition(
+            new CpsFlowDefinition(
+                    "node {\n"
+                            + "  unzip '"
+                            + zipFile.getPath()
+                            + "'\n"
+                            + "  nextVersion(writeVersion: true)\n"
+                            + "}\n",
+                    true));
+
+    WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+
+    System.out.println(JenkinsRule.getLog(b));
+    assertThat(JenkinsRule.getLog(b), containsString("Started"));
+    assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
+    assertThat(JenkinsRule.getLog(b), containsString("No tags found"));
+    assertThat(JenkinsRule.getLog(b), containsString("0.1.0"));
+    assertThat(
+            JenkinsRule.getLog(b),
+            containsString("The next version was written to the configuration file."));
+    assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
+  }
+
+  @Test
+  public void shouldFailWriteVersion() throws Exception {
+    WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
+    URL zipFile = getClass().getResource("simple-project-with-notags.zip");
+    assertThat(zipFile, is(notNullValue()));
+
+    p.setDefinition(
+            new CpsFlowDefinition(
+                    "node {\n"
+                            + "  unzip '"
+                            + zipFile.getPath()
+                            + "'\n"
+                            + "  nextVersion(writeVersion: true)\n"
+                            + "}\n",
+                    true));
+
+    WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+
+    System.out.println(JenkinsRule.getLog(b));
+    assertThat(JenkinsRule.getLog(b), containsString("Started"));
+    assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
+    assertThat(JenkinsRule.getLog(b), containsString("No tags found"));
+    assertThat(JenkinsRule.getLog(b), containsString("0.1.0"));
+    assertThat(
+            JenkinsRule.getLog(b),
+            containsString("Could not write the next version to the configuration file."));
+    assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
+  }
 }
