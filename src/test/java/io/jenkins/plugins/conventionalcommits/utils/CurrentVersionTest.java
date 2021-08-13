@@ -9,9 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +24,8 @@ public class CurrentVersionTest {
   @Rule public TemporaryFolder rootFolder = new TemporaryFolder();
 
   @Mock private ProcessHelper processHelper;
+
+  @Mock private PrintStream mockedLogger;
 
   @Test
   public void testMavenProjectVersion() throws IOException, InterruptedException {
@@ -63,7 +63,7 @@ public class CurrentVersionTest {
     CurrentVersion currentVersion = new CurrentVersion();
     currentVersion.setProcessHelper(processHelper);
 
-    Version testCurrentVersion = currentVersion.getCurrentVersion(mavenDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(mavenDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -105,7 +105,7 @@ public class CurrentVersionTest {
     CurrentVersion currentVersion = new CurrentVersion();
     currentVersion.setProcessHelper(processHelper);
 
-    Version testCurrentVersion = currentVersion.getCurrentVersion(gradleDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(gradleDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -126,7 +126,7 @@ public class CurrentVersionTest {
 
     Version actualCurrentVersion = Version.valueOf("1.10.0");
     CurrentVersion currentVersion = new CurrentVersion();
-    Version testCurrentVersion = currentVersion.getCurrentVersion(makeDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(makeDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -149,7 +149,7 @@ public class CurrentVersionTest {
 
     Version actualCurrentVersion = Version.valueOf("1.0.0");
     CurrentVersion currentVersion = new CurrentVersion();
-    Version testCurrentVersion = currentVersion.getCurrentVersion(npmDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(npmDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -191,7 +191,7 @@ public class CurrentVersionTest {
     CurrentVersion currentVersion = new CurrentVersion();
     currentVersion.setProcessHelper(processHelper);
 
-    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -212,7 +212,7 @@ public class CurrentVersionTest {
 
     Version actualCurrentVersion = Version.valueOf("0.1.0");
     CurrentVersion currentVersion = new CurrentVersion();
-    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -241,7 +241,7 @@ public class CurrentVersionTest {
 
     Version actualCurrentVersion = Version.valueOf("1.0.0");
     CurrentVersion currentVersion = new CurrentVersion();
-    Version testCurrentVersion = currentVersion.getCurrentVersion(helmDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(helmDir, "", mockedLogger);
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
   }
@@ -266,7 +266,7 @@ public class CurrentVersionTest {
 
     Version actualCurrentVersion = Version.valueOf("1.0.0");
     CurrentVersion currentVersion = new CurrentVersion();
-    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -279,7 +279,7 @@ public class CurrentVersionTest {
     Version actualCurrentVersion = Version.valueOf("0.1.0");
 
     CurrentVersion currentVersion = new CurrentVersion();
-    Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "0.1.0");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "0.1.0", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
@@ -292,9 +292,43 @@ public class CurrentVersionTest {
     Version actualCurrentVersion = Version.valueOf("0.0.0");
 
     CurrentVersion currentVersion = new CurrentVersion();
-    Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "");
+    Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "", mockedLogger);
 
     assertThat(testCurrentVersion, is(notNullValue()));
     assertThat(actualCurrentVersion, is(testCurrentVersion));
+  }
+
+  @Test
+  public void CurrentVersionMismatchWithTag() throws IOException, InterruptedException {
+
+    File testDir = rootFolder.newFolder("SampleProject");
+    Version actualCurrentVersion = Version.valueOf("0.3.0");
+
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(testDir, "0.3.0", mockedLogger);
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(testCurrentVersion, is(actualCurrentVersion));
+  }
+
+  @Test
+  public void testPythonProjectVersionMismatchWithTag() throws IOException, InterruptedException {
+
+    File pyDir = rootFolder.newFolder("SamplePythonProject");
+    File setupCfg = rootFolder.newFile(pyDir.getName() + File.separator + "setup.cfg");
+
+    String setupCfgContent =
+        "[metadata]\n" + "name = sample\n" + "version = 0.1.0\n" + "author = Sample Author";
+
+    FileWriter setupCfgWriter = new FileWriter(setupCfg);
+    setupCfgWriter.write(setupCfgContent);
+    setupCfgWriter.close();
+
+    Version actualCurrentVersion = Version.valueOf("0.4.0");
+    CurrentVersion currentVersion = new CurrentVersion();
+    Version testCurrentVersion = currentVersion.getCurrentVersion(pyDir, "0.4.0", mockedLogger);
+
+    assertThat(testCurrentVersion, is(notNullValue()));
+    assertThat(testCurrentVersion, is(actualCurrentVersion));
   }
 }
