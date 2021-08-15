@@ -125,8 +125,15 @@ public class NextVersionStep extends Step {
 
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(outputFormat, startTag, buildMetadata, writeVersion, preRelease,
-        preservePreRelease, incrementPreRelease, stepContext);
+    return new Execution(
+        outputFormat,
+        startTag,
+        buildMetadata,
+        writeVersion,
+        preRelease,
+        preservePreRelease,
+        incrementPreRelease,
+        stepContext);
   }
 
   /** This class extends Step Execution class, contains the run method. */
@@ -175,18 +182,24 @@ public class NextVersionStep extends Step {
     /**
      * Constructor with fields initialisation.
      *
-     * @param outputFormat        Output format for the next version
-     * @param startTag            Git tag
-     * @param buildMetadata       Add meta date to the version.
-     * @param writeVersion        Should write the new version in the file.
-     * @param preRelease          Pre release information to add
-     * @param preservePreRelease  Keep existing prerelease information or not
+     * @param outputFormat Output format for the next version
+     * @param startTag Git tag
+     * @param buildMetadata Add meta date to the version.
+     * @param writeVersion Should write the new version in the file.
+     * @param preRelease Pre release information to add
+     * @param preservePreRelease Keep existing prerelease information or not
      * @param incrementPreRelease Increment prerelease information or not
-     * @param context             Jenkins context
+     * @param context Jenkins context
      */
-    protected Execution(String outputFormat, String startTag, String buildMetadata,
-                        boolean writeVersion, String preRelease, boolean preservePreRelease,
-                        boolean incrementPreRelease, @Nonnull StepContext context) {
+    protected Execution(
+        String outputFormat,
+        String startTag,
+        String buildMetadata,
+        boolean writeVersion,
+        String preRelease,
+        boolean preservePreRelease,
+        boolean incrementPreRelease,
+        @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
       this.startTag = startTag;
@@ -237,8 +250,7 @@ public class NextVersionStep extends Step {
         Version nextVersion;
         if (!incrementPreRelease || StringUtils.isEmpty(currentVersion.getPreReleaseVersion())) {
           // based on the commit list, determine how to bump the version
-          nextVersion =
-              new ConventionalCommits().nextVersion(currentVersion, commitHistory);
+          nextVersion = new ConventionalCommits().nextVersion(currentVersion, commitHistory);
         } else {
           nextVersion = currentVersion.incrementPreReleaseVersion();
         }
@@ -263,12 +275,13 @@ public class NextVersionStep extends Step {
           nextVersion = nextVersion.setPreReleaseVersion(preRelease);
         }
 
+        getContext().get(TaskListener.class).getLogger().println(nextVersion);
+
         if (writeVersion) {
           WriteVersion writer = new WriteVersion();
-          writer.write(nextVersion, dir);
+          String writeLog = writer.write(nextVersion, dir);
+          getContext().get(TaskListener.class).getLogger().println(writeLog);
         }
-
-        getContext().get(TaskListener.class).getLogger().println(nextVersion);
 
         return nextVersion.toString();
       }
