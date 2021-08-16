@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.zafarkhaja.semver.Version;
-import io.jenkins.plugins.conventionalcommits.process.DefaultProcessHelper;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 import java.io.File;
 import java.io.FileWriter;
@@ -88,6 +87,6 @@ public class NpmProjectTypeTest {
         new IOException("Cannot run program \"npm\""));
     NpmProjectType npmProjectType = new NpmProjectType();
 
-    npmProjectType.writeVersion(fooDir, Version.valueOf("1.1.0"), new DefaultProcessHelper());
+    npmProjectType.writeVersion(fooDir, Version.valueOf("1.1.0"), mockProcessHelper);
   }
 }
