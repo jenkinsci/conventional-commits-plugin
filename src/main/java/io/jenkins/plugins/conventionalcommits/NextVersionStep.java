@@ -233,7 +233,10 @@ public class NextVersionStep extends Step {
           }
         }
 
-        Version currentVersion = new CurrentVersion().getCurrentVersion(dir, latestTag);
+        Version currentVersion =
+            new CurrentVersion()
+                .getCurrentVersion(
+                    dir, latestTag, getContext().get(TaskListener.class).getLogger());
 
         String commitMessagesString = null;
         if (latestTag.isEmpty()) {
