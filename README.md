@@ -35,6 +35,21 @@ pipeline {
     }
 }
 ```
+### In a scripted Pipeline
+
+```groovy
+def NEXT_VERSION
+node {                                                 
+    stage('Get next version ...') {
+      NEXT_VERSION=nextVersion()
+      echo "Next version : $NEXT_VERSION"
+    }
+    stage ('Release') {
+        echo "mvn release:prepare -DdevelopmentVersion=$NEXT_VERSION"
+        echo 'mvn release:perform'
+    }
+}
+```
 
 ## Using Optional Parameters
 
