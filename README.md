@@ -45,7 +45,7 @@ node {
       echo "Next version : $NEXT_VERSION"
     }
     stage ('Release') {
-        echo "mvn release:prepare -DdevelopmentVersion=$NEXT_VERSION"
+        echo "mvn release:prepare -DreleaseVersion=$NEXT_VERSION"
         echo 'mvn release:perform'
     }
 }
