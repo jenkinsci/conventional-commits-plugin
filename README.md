@@ -111,6 +111,48 @@ The table below resume the combined use of these options and the result:
 | 0.1.0-alpha     | -                          | X                  | -                         | beta       | -                  | -                    |	**0.2.0-beta**    |
 | 0.1.0-alpha     | -                          | -                  | X                         | beta       | -                  | -                    |	**0.1.1-beta**    |
 
+### Write next version in the configuration file (pom.xml, package.json)
+The optional parameter `writeVersion` allow writing back to the file the next calculated version.
+
+**:warning: For some configurations files, the CLI is needed (maven fo example). :warning:** 
+
+The supported configurations files : 
+ - pom.xml : need the Maven CLI in the path,
+ - package.json : need the Npm CLI in the path.
+
+Example of use :
+With a project with a package.json as follows : 
+```json
+{
+  "name": "conventional-commits-plugin-example-npm",
+  "version": "1.0.0",
+  "description": "Npm example project"
+}
+``` 
+The following pipeline with a commit with a commit message like _feat: my cool feature_: 
+```groovy
+pipeline {
+    agent any
+    environment {
+        NEXT_VERSION = nextVersion(writeVersion: true)
+    }
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+```
+Will update the _package.json_ as follow : 
+```json
+{
+  "name": "conventional-commits-plugin-example-npm",
+  "version": "1.1.0",
+  "description": "Npm example project"
+}
+``` 
 
 ## Issues
 
