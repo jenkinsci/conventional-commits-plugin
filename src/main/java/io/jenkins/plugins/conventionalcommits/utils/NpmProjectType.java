@@ -6,6 +6,8 @@ import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -48,6 +50,21 @@ public class NpmProjectType extends ProjectType {
     return Version.valueOf((String) map.get("version"));
   }
 
+  /**
+   * Write back to the <code>package.json</code> file the next version.<br>
+   * Use the npm command <code>version</code>, see : https://docs.npmjs.com/cli/v6/commands/npm-version.
+   *
+   * @param directory The directory where write the file.
+   * @param nextVersion The next version to use.
+   * @param processHelper The helper to run the command.
+   * @throws IOException If errors occurs when write the file
+   * @throws InterruptedException It errors occurs with the npm command.
+   */
   @Override
-  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper) {}
+  public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
+      throws IOException, InterruptedException {
+    List<String> command =
+        Arrays.asList("npm", "version", nextVersion.toString());
+    processHelper.runProcessBuilder(directory, command);
+  }
 }
