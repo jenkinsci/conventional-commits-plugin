@@ -9,7 +9,9 @@ import io.jenkins.plugins.conventionalcommits.dto.HelmChart;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Represent an Helm project type (i.e with a Chart.yaml file).
@@ -17,6 +19,8 @@ import java.util.Objects;
 public class HelmProjectType extends ProjectType {
   // Helm chart's file name
   private static final String CHART_YAML_NAME = "Chart.yaml";
+  // Name of the key that store version value in a Chart.yaml
+  private static final String VERSION_KEY_IN_CHART = "version";
   // Jackson mapper to handle YAML file
   private final ObjectMapper yamlMapper;
 
@@ -28,6 +32,10 @@ public class HelmProjectType extends ProjectType {
     YAMLFactory yamlFactory = new YAMLFactory();
     // Remove quotes on strings
     yamlFactory.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
+    // Remove --- as start marker
+    yamlFactory.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
+    // Indent array with 2 spaces
+    yamlFactory.enable(YAMLGenerator.Feature.INDENT_ARRAYS_WITH_INDICATOR);
     yamlMapper = new ObjectMapper(yamlFactory);
     // Ignore properties that are not in the DTO
     yamlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -55,9 +63,12 @@ public class HelmProjectType extends ProjectType {
    */
   @Override
   public Version getCurrentVersion(File directory, ProcessHelper processHelper) throws IOException {
-    // readChartFile(directory) can't be null, an Exception is thrown if a problem occur
-    // (file note found, file malformed, ..)
-    return Version.valueOf(readChartFile(directory).getVersion());
+
+    String version = (String) readChartFile(directory).get(VERSION_KEY_IN_CHART);
+    if (StringUtils.isNotEmpty(version)) {
+      return Version.valueOf((String) readChartFile(directory).get(VERSION_KEY_IN_CHART));
+    }
+    throw new IOException("Unable to get the version field in chart file.");
   }
 
   /**
@@ -74,11 +85,15 @@ public class HelmProjectType extends ProjectType {
       throws IOException, InterruptedException {
     Objects.requireNonNull(nextVersion);
 
-    HelmChart helmChart = readChartFile(directory);
-    helmChart.setVersion(nextVersion.toString());
-
-    yamlMapper.writeValue(new File(directory.getAbsoluteFile() + File.separator + CHART_YAML_NAME),
-        helmChart);
+    Map<String, Object> helmChart = readChartFile(directory);
+    if (StringUtils.isNotEmpty((String) helmChart.get(VERSION_KEY_IN_CHART))) {
+      helmChart.put(VERSION_KEY_IN_CHART, nextVersion.toString());
+      yamlMapper.writeValue(
+          new File(directory.getAbsoluteFile() + File.separator + CHART_YAML_NAME),
+          helmChart);
+    } else {
+      throw new IOException("Unable to get the version field in chart file.");
+    }
   }
 
   // Private methods
@@ -90,11 +105,11 @@ public class HelmProjectType extends ProjectType {
    * @return helm DTO {@link HelmChart}
    * @throws IOException If an error occurred when accessing files or directory.
    */
-  private HelmChart readChartFile(File directory) throws IOException {
+  private Map<String, Object> readChartFile(File directory) throws IOException {
     Objects.requireNonNull(directory);
 
     // Convert Chart.yaml to a DTO
     return yamlMapper.readValue(
-        new File(directory.getAbsoluteFile() + File.separator + CHART_YAML_NAME), HelmChart.class);
+        new File(directory.getAbsoluteFile() + File.separator + CHART_YAML_NAME), Map.class);
   }
 }
