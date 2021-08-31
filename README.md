@@ -132,8 +132,9 @@ The optional parameter `writeVersion` allow writing back to the file the next ca
 **:warning: For some configurations files, the CLI is needed (maven fo example). :warning:** 
 
 The supported configurations files : 
- - pom.xml : need the Maven CLI in the path,
- - package.json : need the Npm CLI in the path.
+ - pom.xml (Maven) : need the Maven CLI in the path,
+ - package.json (NPM) : need the Npm CLI in the path,
+ - chart.yaml (Helm).
 
 Example of use :
 With a project with a package.json as follows : 
