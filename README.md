@@ -135,7 +135,7 @@ The supported configurations files :
  - pom.xml (Maven) : need the Maven CLI in the path,
  - package.json (NPM) : need the Npm CLI in the path,
  - chart.yaml (Helm),
- - build.gradle (Gradle) : need the Gradle CLI in the path.
+ - build.gradle (Gradle).
 
 Example of use :
 With a project with a package.json as follows : 
