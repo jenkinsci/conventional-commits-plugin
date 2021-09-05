@@ -20,7 +20,7 @@ public class GradleProjectTypeTest {
   final private String buildGradleWithVersionContent =
       "mainClassName = 'io.jenkins.plugin.conventionalcommits'\n" +
           "version = '1.0.0'";
-  final private String buildGradleWithWithoutVersionContent =
+  final private String buildGradleWithoutVersionContent =
       "mainClassName = 'io.jenkins.plugin.conventionalcommits'";
 
 
@@ -57,6 +57,19 @@ public class GradleProjectTypeTest {
     File gradleDir = rootFolder.newFolder("SampleGradleProject");
 
     // When : ask to write next version in file
+    GradleProjectType gradleProjectType = new GradleProjectType();
+    gradleProjectType.writeVersion(gradleDir, Version.valueOf("1.1.0"), null);
+
+    // Then : IOException is thrown
+  }
+
+  @Test(expected = IOException.class)
+  public void shouldThrowIOExceptionIfNoVersionTag() throws Exception {
+    // Given a directory with a gradle.build file
+    File gradleDir = rootFolder.newFolder("SampleGradleProject");
+    createBuildGradleFile(gradleDir, buildGradleWithoutVersionContent);
+
+    // When : write next version tp the file
     GradleProjectType gradleProjectType = new GradleProjectType();
     gradleProjectType.writeVersion(gradleDir, Version.valueOf("1.1.0"), null);
 

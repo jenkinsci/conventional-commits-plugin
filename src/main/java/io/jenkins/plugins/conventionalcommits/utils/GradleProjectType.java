@@ -67,6 +67,8 @@ public class GradleProjectType extends ProjectType {
 
     // Line to read
     String line;
+    // Flag to know if a version tag is in the build.gradle
+    boolean isVersionTag = false;
     // Absolute path to the build.temp file
     String buildTempPath =
         String.format("%s%sbuild.temp", directory.getAbsolutePath(), File.separator);
@@ -80,13 +82,20 @@ public class GradleProjectType extends ProjectType {
     while ((line = reader.readLine()) != null) {
       if (line.contains("version")) {
         fw.write(String.format("version = '%s'\n", nextVersion));
+        isVersionTag = true;
       } else {
         fw.write(String.format("%s\n", line));
       }
     }
     fw.close();
 
-    // Replace build.gradle with updated version
-    Files.move(Paths.get(buildTempPath), Paths.get(buildPath), StandardCopyOption.REPLACE_EXISTING);
+    if (isVersionTag) {
+      // Replace build.gradle with updated version
+      Files.move(Paths.get(buildTempPath), Paths.get(buildPath),
+          StandardCopyOption.REPLACE_EXISTING);
+    } else {
+      Files.deleteIfExists(Paths.get(buildPath));
+      throw new IOException("Unable to get version on build.gradle");
+    }
   }
 }
