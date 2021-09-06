@@ -74,7 +74,7 @@ public class GradleProjectTypeTest {
   }
 
   @Test
-  public void getCurrentVersion() throws Exception {
+  public void shouldGetCurrentVersion() throws Exception {
     // Given a gradle project in 1.0.0 version
     File gradleDir = rootFolder.newFolder("SampleGradleProject");
     createBuildGradleFiles(gradleDir, buildGradleWithVersionContent);
