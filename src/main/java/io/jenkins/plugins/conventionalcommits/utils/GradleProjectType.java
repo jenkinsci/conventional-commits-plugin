@@ -80,10 +80,10 @@ public class GradleProjectType extends ProjectType {
       try (FileWriter fw = new FileWriter(buildTempPath)) {
         while ((line = reader.readLine()) != null) {
           if (line.contains("version")) {
-            fw.write(String.format("version = %s\n", nextVersion));
+            fw.write(String.format("version = %s%n", nextVersion));
             isVersionTag = true;
           } else {
-            fw.write(String.format("%s\n", line));
+            fw.write(String.format("%s%n", line));
           }
         }
       }
