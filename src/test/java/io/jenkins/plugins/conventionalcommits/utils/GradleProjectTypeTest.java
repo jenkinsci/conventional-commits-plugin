@@ -18,14 +18,15 @@ public class GradleProjectTypeTest {
   final public TemporaryFolder rootFolder = new TemporaryFolder();
 
   final private String buildGradleWithVersionContent =
-      "mainClassName = 'io.jenkins.plugin.conventionalcommits'\n" +
-          "version = '1.0.0'";
+      "foo = foo value\n" +
+          "version = 1.0.0\n" +
+          "bar = bar value";
   final private String buildGradleWithoutVersionContent =
-      "mainClassName = 'io.jenkins.plugin.conventionalcommits'";
-
+      "foo = foo value\n" +
+          "bar = bar value";
 
   private void createBuildGradleFile(File gradleDir, String content) throws Exception {
-    File buildGradle = rootFolder.newFile(gradleDir.getName() + File.separator + "build.gradle");
+    File buildGradle = rootFolder.newFile(gradleDir.getName() + File.separator + "gradle.properties");
     FileWriter gradleWriter = new FileWriter(buildGradle);
     gradleWriter.write(content);
     gradleWriter.close();
@@ -44,10 +45,11 @@ public class GradleProjectTypeTest {
 
     // Then : the file is updated
     String buildGradleExpected =
-        "mainClassName = 'io.jenkins.plugin.conventionalcommits'\n" +
-            "version = '1.1.0'";
+        "foo = foo value\n" +
+            "version = 1.1.0\n" +
+            "bar = bar value";
     assertThat(new String(
-            Files.readAllBytes(Paths.get(gradleDir.getPath() + File.separator + "build.gradle"))),
+            Files.readAllBytes(Paths.get(gradleDir.getPath() + File.separator + "gradle.properties"))),
         containsString(buildGradleExpected));
   }
 

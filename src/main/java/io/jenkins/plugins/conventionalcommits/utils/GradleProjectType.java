@@ -71,31 +71,31 @@ public class GradleProjectType extends ProjectType {
     boolean isVersionTag = false;
     // Absolute path to the build.temp file
     String buildTempPath =
-        String.format("%s%sbuild.temp", directory.getAbsolutePath(), File.separator);
+        String.format("%s%sgradle.temp", directory.getAbsolutePath(), File.separator);
     // Absolute path to the build.gradle file
     String buildPath =
-        String.format("%s%sbuild.gradle", directory.getAbsolutePath(), File.separator);
+        String.format("%s%sgradle.properties", directory.getAbsolutePath(), File.separator);
 
-    FileWriter fw = new FileWriter(buildTempPath);
-    BufferedReader reader = Files.newBufferedReader(Paths.get(buildPath));
-
-    while ((line = reader.readLine()) != null) {
-      if (line.contains("version")) {
-        fw.write(String.format("version = '%s'\n", nextVersion));
-        isVersionTag = true;
-      } else {
-        fw.write(String.format("%s\n", line));
+    try (BufferedReader reader = Files.newBufferedReader(Paths.get(buildPath))) {
+      try (FileWriter fw = new FileWriter(buildTempPath)) {
+        while ((line = reader.readLine()) != null) {
+          if (line.contains("version")) {
+            fw.write(String.format("version = %s\n", nextVersion));
+            isVersionTag = true;
+          } else {
+            fw.write(String.format("%s\n", line));
+          }
+        }
       }
     }
-    fw.close();
 
     if (isVersionTag) {
-      // Replace build.gradle with updated version
+      // Replace gradle.properties with updated version
       Files.move(Paths.get(buildTempPath), Paths.get(buildPath),
           StandardCopyOption.REPLACE_EXISTING);
     } else {
       Files.deleteIfExists(Paths.get(buildPath));
-      throw new IOException("Unable to get version on build.gradle");
+      throw new IOException("Unable to get version in gradle.properties");
     }
   }
 }
