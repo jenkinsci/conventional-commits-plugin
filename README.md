@@ -134,7 +134,8 @@ The optional parameter `writeVersion` allow writing back to the file the next ca
 The supported configurations files : 
  - pom.xml (Maven) : need the Maven CLI in the path,
  - package.json (NPM) : need the Npm CLI in the path,
- - chart.yaml (Helm).
+ - chart.yaml (Helm),
+ - build.gradle / gradle.properties (Gradle).
 
 Example of use :
 With a project with a package.json as follows : 
