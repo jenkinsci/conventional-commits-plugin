@@ -3,9 +3,10 @@ package io.jenkins.plugins.conventionalcommits.utils;
 import com.github.zafarkhaja.semver.Version;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -13,9 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Represent a Gradle project type (i.e with a build.gradle file).
- */
+/** Represent a Gradle project type (i.e with a build.gradle file). */
 public class GradleProjectType extends ProjectType {
 
   public boolean check(File directory) {
@@ -50,13 +49,13 @@ public class GradleProjectType extends ProjectType {
   }
 
   /**
-   * Write the new calculated version in the build.gradle file.
-   * If no version property is found, do nothing.
+   * Write the new calculated version in the build.gradle file. If no version property is found, do
+   * nothing.
    *
-   * @param directory     The directory where find the build.gradle. <b>Mandatory</b>
-   * @param nextVersion   The next version to write. <b>Mandatory</b>
+   * @param directory The directory where find the build.gradle. <b>Mandatory</b>
+   * @param nextVersion The next version to write. <b>Mandatory</b>
    * @param processHelper Not used.
-   * @throws IOException          If an error occurs when accessing to the build.gradle
+   * @throws java.io.IOException If an error occurs when accessing to the build.gradle
    * @throws InterruptedException Not used.
    */
   @Override
@@ -77,7 +76,8 @@ public class GradleProjectType extends ProjectType {
         String.format("%s%sgradle.properties", directory.getAbsolutePath(), File.separator);
 
     try (BufferedReader reader = Files.newBufferedReader(Paths.get(buildPath))) {
-      try (FileWriter fw = new FileWriter(buildTempPath)) {
+      try (BufferedWriter fw =
+          Files.newBufferedWriter(Paths.get(buildTempPath), StandardCharsets.UTF_8)) {
         while ((line = reader.readLine()) != null) {
           if (line.contains("version")) {
             fw.write(String.format("version = %s%n", nextVersion));
@@ -91,8 +91,8 @@ public class GradleProjectType extends ProjectType {
 
     if (isVersionTag) {
       // Replace gradle.properties with updated version
-      Files.move(Paths.get(buildTempPath), Paths.get(buildPath),
-          StandardCopyOption.REPLACE_EXISTING);
+      Files.move(
+          Paths.get(buildTempPath), Paths.get(buildPath), StandardCopyOption.REPLACE_EXISTING);
     } else {
       Files.deleteIfExists(Paths.get(buildPath));
       throw new IOException("Unable to get version in gradle.properties");
