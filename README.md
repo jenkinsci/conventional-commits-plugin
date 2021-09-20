@@ -9,6 +9,7 @@
 ## Introduction
 
 This plugin can be used to determine the next release version based on previous tags and the commit messages used.  
+:warning: By default only [annotated tag(https://git-scm.com/book/en/v2/Git-Basics-Tagging)] are supported, to support non annotated tag you must use an option to activate this feature (see below).:warning: 
 It calculates the version number based on the format of the commit message.  
 The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
