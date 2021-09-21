@@ -423,4 +423,30 @@ public class JenkinsTest {
             containsString("Could not write the next version to the configuration file."));
     assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
   }
+
+  @Test
+  public void shouldUseNonAnnotatedTag() throws Exception {
+    // Given : a project with last tag (1.1.0) is non annotated
+    WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
+    URL zipFile = getClass().getResource("simple-project-with-annotated-tags.zip");
+    assertThat(zipFile, is(notNullValue()));
+
+    // When: ask to have nextVersion with nonAnnotatedTag option to true
+    p.setDefinition(
+        new CpsFlowDefinition(
+            "node {\n"
+                + "  unzip '"
+                + zipFile.getPath()
+                + "'\n"
+                + "  nextVersion(nonAnnotatedTag: true)\n"
+                + "}\n",
+            true));
+
+    // Then : the given nextVersion is based on the last tag (even if it's a non annotated tag)
+    WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+    assertThat(JenkinsRule.getLog(b), containsString("Started"));
+    assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
+    assertThat(JenkinsRule.getLog(b), containsString("1.2.0"));
+    assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
+  }
 }
