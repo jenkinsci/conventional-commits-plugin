@@ -428,7 +428,7 @@ public class JenkinsTest {
   public void shouldUseNonAnnotatedTag() throws Exception {
     // Given : a project with last tag (1.1.0) is non annotated
     WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
-    URL zipFile = getClass().getResource("simple-project-with-annotated-tags.zip");
+    URL zipFile = getClass().getResource("simple-project-with-non-annotated-tags.zip");
     assertThat(zipFile, is(notNullValue()));
 
     // When: ask to have nextVersion with nonAnnotatedTag option to true
@@ -446,7 +446,7 @@ public class JenkinsTest {
     WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
     assertThat(JenkinsRule.getLog(b), containsString("Started"));
     assertThat(JenkinsRule.getLog(b), containsString("nextVersion"));
-    assertThat(JenkinsRule.getLog(b), containsString("1.2.0"));
+    assertThat(JenkinsRule.getLog(b), containsString("1.1.1"));
     assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
   }
 }
