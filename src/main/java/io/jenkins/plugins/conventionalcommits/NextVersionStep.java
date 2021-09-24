@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
@@ -40,6 +41,8 @@ public class NextVersionStep extends Step {
   private boolean incrementPreRelease;
   private String buildMetadata;
   private boolean writeVersion;
+  // True if non annotated tag are supported
+  private boolean nonAnnotatedTag;
 
   @DataBoundConstructor
   public NextVersionStep() {
@@ -123,6 +126,11 @@ public class NextVersionStep extends Step {
     this.incrementPreRelease = incrementPreRelease;
   }
 
+  @DataBoundSetter
+  public void setNonAnnotatedTag(boolean nonAnnotatedTag) {
+    this.nonAnnotatedTag = nonAnnotatedTag;
+  }
+
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
     return new Execution(
@@ -133,6 +141,7 @@ public class NextVersionStep extends Step {
         preRelease,
         preservePreRelease,
         incrementPreRelease,
+        nonAnnotatedTag,
         stepContext);
   }
 
@@ -179,6 +188,13 @@ public class NextVersionStep extends Step {
     // True to increment prerelease information instead of the version itself
     private final transient boolean incrementPreRelease;
 
+    // True if annotated tags are supported
+    @SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Only used when starting.")
+    private final transient boolean nonAnnotatedTag;
+
+
     /**
      * Constructor with fields initialisation.
      *
@@ -189,6 +205,7 @@ public class NextVersionStep extends Step {
      * @param preRelease Pre release information to add
      * @param preservePreRelease Keep existing prerelease information or not
      * @param incrementPreRelease Increment prerelease information or not
+     * @param nonAnnotatedTag Should use or non annotated tags
      * @param context Jenkins context
      */
     protected Execution(
@@ -199,6 +216,7 @@ public class NextVersionStep extends Step {
         String preRelease,
         boolean preservePreRelease,
         boolean incrementPreRelease,
+        boolean nonAnnotatedTag,
         @Nonnull StepContext context) {
       super(context);
       this.outputFormat = outputFormat;
@@ -208,6 +226,36 @@ public class NextVersionStep extends Step {
       this.preRelease = preRelease;
       this.preservePreRelease = preservePreRelease;
       this.incrementPreRelease = incrementPreRelease;
+      this.nonAnnotatedTag = nonAnnotatedTag;
+    }
+
+    /**
+     * Return the last tag.
+     *
+     * @param dir The project's directory.
+     * @param includeNonAnnotatedTags If true include the non annotated tag.
+     *
+     * @return The last tag of the project.
+     */
+    private String getLatestTag(File dir, boolean includeNonAnnotatedTags)
+        throws InterruptedException, IOException {
+      Objects.requireNonNull(dir, "Directory is mandatory");
+      String latestTag = "";
+      try {
+        if (includeNonAnnotatedTags) {
+          latestTag = execute(dir, "git", "tag", "-l").trim();
+          latestTag = latestTag.substring(latestTag.lastIndexOf("\n") + 1);
+        } else {
+          latestTag = execute(dir, "git", "describe", "--abbrev=0", "--tags").trim();
+        }
+      } catch (IOException exp) {
+        if (exp.getMessage().contains("No names found, cannot describe anything.")) {
+          getContext().get(TaskListener.class).getLogger().println("No tags found");
+        }
+      }
+
+      getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
+      return latestTag;
     }
 
     @Override
@@ -222,16 +270,7 @@ public class NextVersionStep extends Step {
         throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
       } else {
         File dir = new File(workspace.getRemote());
-        // git describe --abbrev=0 --tags
-        String latestTag = "";
-        try {
-          latestTag = execute(dir, "git", "describe", "--abbrev=0", "--tags").trim();
-          getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
-        } catch (IOException exp) {
-          if (exp.getMessage().contains("No names found, cannot describe anything.")) {
-            getContext().get(TaskListener.class).getLogger().println("No tags found");
-          }
-        }
+        String latestTag = getLatestTag(dir, nonAnnotatedTag);
 
         Version currentVersion =
             new CurrentVersion()

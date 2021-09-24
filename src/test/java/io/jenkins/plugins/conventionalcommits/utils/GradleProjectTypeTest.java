@@ -95,18 +95,14 @@ public class GradleProjectTypeTest {
     File gradleDir = rootFolder.newFolder("SampleGradleProject");
     createBuildGradleFiles(gradleDir, buildGradleWithVersionContent);
 
-    // When : write next version tp the file
+    // When : write next version to the file
     GradleProjectType gradleProjectType = new GradleProjectType();
     gradleProjectType.writeVersion(gradleDir, Version.valueOf("1.1.0"), null);
 
     // Then : the file is updated
-    String buildGradleExpected =
-        "foo = foo value\n" +
-            "version = 1.1.0\n" +
-            "bar = bar value";
     assertThat(new String(
             Files.readAllBytes(Paths.get(gradleDir.getPath() + File.separator + "gradle.properties"))),
-        containsString(buildGradleExpected));
+        containsString("version = 1.1.0"));
   }
 
   @Test(expected = IOException.class)
