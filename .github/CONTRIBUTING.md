@@ -2,6 +2,8 @@
 
 Thank you for investing your time in contributing to our project! We encourage everyone to create [pull requests](https://github.com/jenkinsci/conventional-commits-plugin/pulls), [propose features and discuss issues](https://github.com/jenkinsci/conventional-commits-plugin/issues).
 
+(*You could also check out our generic [`CONTRIBUTING.md`](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file for more guidelines on contributing to this repository*)
+
 #### Developer Guidelines
 
 Before you begin, check out our [Developer Guidelines](https://www.jenkins.io/doc/developer/tutorial/prepare/).
