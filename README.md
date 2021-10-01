@@ -8,9 +8,9 @@
 
 ## Introduction
 
-This plugin can be used to determine the next release version based on previous tags and the commit messages used.  
-:warning: By default only [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging) are supported, to support non annotated tag you must use an option to activate this feature (see below).:warning: 
-It calculates the version number based on the format of the commit message.  
+This plugin can be used to determine the next release version based on previous tags and the commit messages used.
+:warning: By default only [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging) are supported, to support non annotated tag you must use an option to activate this feature (see below).:warning:
+It calculates the version number based on the format of the commit message.
 The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Getting started
@@ -40,7 +40,7 @@ pipeline {
 
 ```groovy
 def NEXT_VERSION
-node {                                                 
+node {
     stage('Get next version ...') {
       NEXT_VERSION=nextVersion()
       echo "Next version : $NEXT_VERSION"
@@ -56,7 +56,7 @@ node {
 
 The plugin provides provision to use optional parameters for support of build metadata, pre-release information, settnig the start tag, etc.
 
-### Build Metadata 
+### Build Metadata
 
 `buildMetadata` an optional parameter can be added as follows:
 
@@ -130,24 +130,24 @@ The table below resume the combined use of these options and the result:
 ### Write next version in the configuration file (pom.xml, package.json)
 The optional parameter `writeVersion` allow writing back to the file the next calculated version.
 
-**:warning: For some configurations files, the CLI is needed (maven fo example). :warning:** 
+**:warning: For some configurations files, the CLI is needed (maven fo example). :warning:**
 
-The supported configurations files : 
+The supported configurations files :
  - pom.xml (Maven) : need the Maven CLI in the path,
  - package.json (NPM) : need the Npm CLI in the path,
  - chart.yaml (Helm),
  - build.gradle / gradle.properties (Gradle).
 
 Example of use :
-With a project with a package.json as follows : 
+With a project with a package.json as follows :
 ```json
 {
   "name": "conventional-commits-plugin-example-npm",
   "version": "1.0.0",
   "description": "Npm example project"
 }
-``` 
-The following pipeline with a commit with a commit message like _feat: my cool feature_: 
+```
+The following pipeline with a commit with a commit message like _feat: my cool feature_:
 ```groovy
 pipeline {
     agent any
@@ -163,18 +163,18 @@ pipeline {
     }
 }
 ```
-Will update the _package.json_ as follow : 
+Will update the _package.json_ as follow :
 ```json
 {
   "name": "conventional-commits-plugin-example-npm",
   "version": "1.1.0",
   "description": "Npm example project"
 }
-``` 
+```
 
 ## Issues
 
-Report issues and enhancements in the [Github issue tracker](https://github.com/jenkinsci/conventional-commits/issues).
+Report issues and enhancements in the [Github issue tracker](https://github.com/jenkinsci/conventional-commits-plugin/issues).
 
 ## Contributing
 
