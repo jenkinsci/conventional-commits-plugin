@@ -178,9 +178,7 @@ Report issues and enhancements in the [Github issue tracker](https://github.com/
 
 ## Contributing
 
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
-
-Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
+We encourage community contributions for this project! For more information on how to contribute to this project, see [the contribution guidelines](./.github/CONTRIBUTING.md)
 
 ## LICENSE
 
