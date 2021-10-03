@@ -25,10 +25,10 @@ public class MakeProjectType extends ProjectType {
 
   @Override
   public Version getCurrentVersion(File directory, ProcessHelper processHelper) 
-    throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
 
     String filePath = directory.getAbsolutePath() + System.getProperty("file.separator")
-    + MAKEFILE_FILENAME;
+        + MAKEFILE_FILENAME;
     File makeFile = new File(filePath);
     Scanner scanner = new Scanner(makeFile, StandardCharsets.UTF_8.name());
     String results = "";
@@ -36,8 +36,8 @@ public class MakeProjectType extends ProjectType {
     while (scanner.hasNextLine()) {
       String line = scanner.nextLine();
       if (line.toLowerCase().startsWith("version ") || line.toLowerCase().startsWith("version")
-        || line.toLowerCase().startsWith("version:") ||
-        line.toLowerCase().startsWith("version :")) {
+          || line.toLowerCase().startsWith("version:") 
+          || line.toLowerCase().startsWith("version :")) {
         String[] words = line.split("=");
         results = words[1].trim();
         break;
@@ -49,7 +49,7 @@ public class MakeProjectType extends ProjectType {
 
   @Override
   public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
-    throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
     Objects.requireNonNull(directory);
     Objects.requireNonNull(nextVersion);
     // Line to read
@@ -58,7 +58,7 @@ public class MakeProjectType extends ProjectType {
     boolean isVersionTag = false;
     // Absolute path to the Makefile
     String buildTempPath = String.format("%s%sMakefile.temp", directory.getAbsolutePath(),
-    File.separator);
+        File.separator);
     // Absolute path to the Makefile
     String buildPath = String.format("%s%sMakefile", directory.getAbsolutePath(), File.separator);
 
@@ -66,13 +66,13 @@ public class MakeProjectType extends ProjectType {
 
     try (BufferedReader reader = Files.newBufferedReader(Paths.get(buildPath))) {
       try (BufferedWriter fw = Files.newBufferedWriter(Paths.get(buildTempPath), 
-        StandardCharsets.UTF_8)) {
+          StandardCharsets.UTF_8)) {
 
         while ((line = reader.readLine()) != null) {
-          if (!isVersionTag & (line.toLowerCase().startsWith("version ") || 
-            line.toLowerCase().startsWith("version")
-            || line.toLowerCase().startsWith("version:") || 
-            line.toLowerCase().startsWith("version :"))) {
+          if (!isVersionTag & (line.toLowerCase().startsWith("version ") 
+              || line.toLowerCase().startsWith("version")
+              || line.toLowerCase().startsWith("version:") 
+              || line.toLowerCase().startsWith("version :"))) {
             String[] words = line.split("=");
             currentVersion = words[1].trim();
             fw.write(String.format("%s%n", line.replace(currentVersion, nextVersion.toString())));
@@ -87,7 +87,7 @@ public class MakeProjectType extends ProjectType {
     if (isVersionTag) {
       // Replace Makefile with updated version
       Files.move(Paths.get(buildTempPath), Paths.get(buildPath), 
-      StandardCopyOption.REPLACE_EXISTING);
+          StandardCopyOption.REPLACE_EXISTING);
     } else {
       Files.deleteIfExists(Paths.get(buildPath));
       throw new IOException("Unable to get version in Makefile");
