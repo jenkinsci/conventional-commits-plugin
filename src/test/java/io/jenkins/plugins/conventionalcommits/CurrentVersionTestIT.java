@@ -6,7 +6,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import hudson.model.Result;
-import java.io.IOException;
 import java.net.URL;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -58,11 +57,11 @@ public class CurrentVersionTestIT {
     assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void shouldNotGetCurrentVersionIfNoConfigurationFile() throws Exception {
     // Given : a project without configuration file
     WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
-    URL zipFile = getClass().getResource("simple-project-with-tags.zip");
+    URL zipFile = getClass().getResource("simple-project-with-notags.zip");
     assertThat(zipFile, is(notNullValue()));
 
     p.setDefinition(
@@ -84,7 +83,13 @@ public class CurrentVersionTestIT {
 
     // When : call currentVersion step
     WorkflowRun b = rule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0).get());
+    System.out.println(JenkinsRule.getLog(b));
 
-    // Then : IOException thrown
+    // Then : current version is 0.0.0
+    assertThat(JenkinsRule.getLog(b), containsString("Started"));
+    assertThat(JenkinsRule.getLog(b), containsString("No tags found"));
+    assertThat(JenkinsRule.getLog(b), containsString("Current Tag is:"));
+    assertThat(JenkinsRule.getLog(b), containsString("Current version is 0.0.0"));
+    assertThat(JenkinsRule.getLog(b), containsString("Finished: SUCCESS"));
   }
 }
