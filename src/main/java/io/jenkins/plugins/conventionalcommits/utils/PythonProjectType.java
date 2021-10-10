@@ -3,9 +3,15 @@ package io.jenkins.plugins.conventionalcommits.utils;
 import com.github.zafarkhaja.semver.Version;
 import io.jenkins.plugins.conventionalcommits.dto.PyProjectToml;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -78,5 +84,75 @@ public class PythonProjectType extends ProjectType {
 
   @Override
   public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
-      throws IOException, InterruptedException {}
+      throws IOException, InterruptedException {
+    if (checkSetupPy(directory)) {
+      // Absolute path to the configFile
+      String buildTempPath = String.format("%s%ssetup.temp", directory.getAbsolutePath(),
+              File.separator);
+      // Absolute path to the Makefile
+      String buildPath = String.format("%s%ssetup.py", directory.getAbsolutePath(), File.separator);
+
+      createNewUpdateFile(buildPath, buildTempPath, nextVersion);
+    } else if (checkSetupCfg(directory)) {
+      // Absolute path to the configFile
+      String buildTempPath = String.format("%s%ssetup.temp", directory.getAbsolutePath(),
+      File.separator);
+      // Absolute path to the Makefile
+      String buildPath = String.format("%s%ssetup.cfg", directory.getAbsolutePath(), File.separator);
+
+      createNewUpdateFile(buildPath, buildTempPath, nextVersion);
+    } else if (checkPyProjectToml(directory)) {
+      // Absolute path to the configFile
+      String buildTempPath = String.format("%s%spyproject.temp", directory.getAbsolutePath(),
+              File.separator);
+      // Absolute path to the Makefile
+      String buildPath = String.format("%s%spyproject.toml", directory.getAbsolutePath(), File.separator);
+
+      createNewUpdateFile(buildPath, buildTempPath, nextVersion);
+    } else {
+      throw new NotImplementedException("Project not supported");
+    }
+  }
+
+  private void createNewUpdateFile(String buildPath, String buildTempPath, Version nextVersion) throws IOException {
+    // Line to read
+    String line;
+    // Flag to know if a version tag is in the Makefile
+    boolean isVersionTag = false;
+
+    String currentVersion;
+
+    try (BufferedReader reader = Files.newBufferedReader(Paths.get(buildPath))) {
+      try (BufferedWriter fw = Files.newBufferedWriter(Paths.get(buildTempPath),
+              StandardCharsets.UTF_8)) {
+
+        while ((line = reader.readLine()) != null) {
+          if (!isVersionTag & (line.toLowerCase().startsWith("version ")
+                  || line.toLowerCase().startsWith("version")
+                  || line.toLowerCase().startsWith("version:")
+                  || line.toLowerCase().startsWith("version :"))) {
+            String[] words = line.split("=");
+            currentVersion = words[1].trim();
+            if(currentVersion.contains("\"")) {
+              fw.write(String.format("%s%n", line.replace(currentVersion, "\"" + nextVersion.toString() + "\"")));
+            } else {
+              fw.write(String.format("%s%n", line.replace(currentVersion, nextVersion.toString())));
+            }
+            isVersionTag = true;
+          } else {
+            fw.write(String.format("%s%n", line));
+          }
+        }
+      }
+
+      if (isVersionTag) {
+        // Replace Makefile with updated version
+        Files.move(Paths.get(buildTempPath), Paths.get(buildPath),
+                StandardCopyOption.REPLACE_EXISTING);
+      } else {
+        Files.deleteIfExists(Paths.get(buildPath));
+        throw new IOException("Unable to get version in config file");
+      }
+    }
+  }
 }
