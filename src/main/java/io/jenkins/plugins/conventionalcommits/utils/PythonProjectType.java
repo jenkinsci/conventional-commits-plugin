@@ -3,7 +3,6 @@ package io.jenkins.plugins.conventionalcommits.utils;
 import com.github.zafarkhaja.semver.Version;
 import io.jenkins.plugins.conventionalcommits.dto.PyProjectToml;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -96,7 +95,7 @@ public class PythonProjectType extends ProjectType {
     } else if (checkSetupCfg(directory)) {
       // Absolute path to the configFile
       String buildTempPath = String.format("%s%ssetup.temp", directory.getAbsolutePath(),
-      File.separator);
+              File.separator);
       // Absolute path to the configFile
       String buildPath = String.format("%s%ssetup.cfg", directory.getAbsolutePath(), File.separator);
 
@@ -133,8 +132,9 @@ public class PythonProjectType extends ProjectType {
                   || line.toLowerCase().startsWith("version :"))) {
             String[] words = line.split("=");
             currentVersion = words[1].trim();
-            if(currentVersion.contains("\"")) {
-              fw.write(String.format("%s%n", line.replace(currentVersion, "\"" + nextVersion.toString() + "\"")));
+            if (currentVersion.contains("\"")) {
+              fw.write(String.format("%s%n", line.replace(currentVersion, "\"" +
+                      nextVersion.toString() + "\"")));
             } else {
               fw.write(String.format("%s%n", line.replace(currentVersion, nextVersion.toString())));
             }
