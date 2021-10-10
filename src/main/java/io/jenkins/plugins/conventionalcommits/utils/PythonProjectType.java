@@ -89,7 +89,7 @@ public class PythonProjectType extends ProjectType {
       // Absolute path to the configFile
       String buildTempPath = String.format("%s%ssetup.temp", directory.getAbsolutePath(),
               File.separator);
-      // Absolute path to the Makefile
+      // Absolute path to the configFile
       String buildPath = String.format("%s%ssetup.py", directory.getAbsolutePath(), File.separator);
 
       createNewUpdateFile(buildPath, buildTempPath, nextVersion);
@@ -97,7 +97,7 @@ public class PythonProjectType extends ProjectType {
       // Absolute path to the configFile
       String buildTempPath = String.format("%s%ssetup.temp", directory.getAbsolutePath(),
       File.separator);
-      // Absolute path to the Makefile
+      // Absolute path to the configFile
       String buildPath = String.format("%s%ssetup.cfg", directory.getAbsolutePath(), File.separator);
 
       createNewUpdateFile(buildPath, buildTempPath, nextVersion);
@@ -105,7 +105,7 @@ public class PythonProjectType extends ProjectType {
       // Absolute path to the configFile
       String buildTempPath = String.format("%s%spyproject.temp", directory.getAbsolutePath(),
               File.separator);
-      // Absolute path to the Makefile
+      // Absolute path to the configFile
       String buildPath = String.format("%s%spyproject.toml", directory.getAbsolutePath(), File.separator);
 
       createNewUpdateFile(buildPath, buildTempPath, nextVersion);
@@ -117,7 +117,7 @@ public class PythonProjectType extends ProjectType {
   private void createNewUpdateFile(String buildPath, String buildTempPath, Version nextVersion) throws IOException {
     // Line to read
     String line;
-    // Flag to know if a version tag is in the Makefile
+    // Flag to know if a version tag is in the config file
     boolean isVersionTag = false;
 
     String currentVersion;
@@ -146,7 +146,7 @@ public class PythonProjectType extends ProjectType {
       }
 
       if (isVersionTag) {
-        // Replace Makefile with updated version
+        // Replace config with updated version
         Files.move(Paths.get(buildTempPath), Paths.get(buildPath),
                 StandardCopyOption.REPLACE_EXISTING);
       } else {
