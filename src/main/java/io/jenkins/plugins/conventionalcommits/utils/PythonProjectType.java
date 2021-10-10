@@ -97,7 +97,8 @@ public class PythonProjectType extends ProjectType {
       String buildTempPath = String.format("%s%ssetup.temp", directory.getAbsolutePath(),
               File.separator);
       // Absolute path to the configFile
-      String buildPath = String.format("%s%ssetup.cfg", directory.getAbsolutePath(), File.separator);
+      String buildPath = String.format("%s%ssetup.cfg", directory.getAbsolutePath(),
+              File.separator);
 
       createNewUpdateFile(buildPath, buildTempPath, nextVersion);
     } else if (checkPyProjectToml(directory)) {
@@ -105,7 +106,8 @@ public class PythonProjectType extends ProjectType {
       String buildTempPath = String.format("%s%spyproject.temp", directory.getAbsolutePath(),
               File.separator);
       // Absolute path to the configFile
-      String buildPath = String.format("%s%spyproject.toml", directory.getAbsolutePath(), File.separator);
+      String buildPath = String.format("%s%spyproject.toml", directory.getAbsolutePath(),
+              File.separator);
 
       createNewUpdateFile(buildPath, buildTempPath, nextVersion);
     } else {
@@ -113,7 +115,8 @@ public class PythonProjectType extends ProjectType {
     }
   }
 
-  private void createNewUpdateFile(String buildPath, String buildTempPath, Version nextVersion) throws IOException {
+  private void createNewUpdateFile(String buildPath, String buildTempPath, Version nextVersion)
+          throws IOException {
     // Line to read
     String line;
     // Flag to know if a version tag is in the config file
@@ -133,8 +136,8 @@ public class PythonProjectType extends ProjectType {
             String[] words = line.split("=");
             currentVersion = words[1].trim();
             if (currentVersion.contains("\"")) {
-              fw.write(String.format("%s%n", line.replace(currentVersion, "\"" +
-                      nextVersion.toString() + "\"")));
+              fw.write(String.format("%s%n", line.replace(currentVersion, "\""
+                      + nextVersion.toString() + "\"")));
             } else {
               fw.write(String.format("%s%n", line.replace(currentVersion, nextVersion.toString())));
             }
