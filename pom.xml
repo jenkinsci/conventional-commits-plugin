@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.27</version>
+        <version>4.28</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
@@ -25,7 +25,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.249.x</artifactId>
-                <version>950.v396cb834de1e</version>
+                <version>961.vf0c9f6f59827</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.12.4</version>
+            <version>4.0.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -133,7 +133,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>9.0</version>
+                        <version>9.0.1</version>
                     </dependency>
                 </dependencies>
             </plugin>

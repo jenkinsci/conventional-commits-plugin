@@ -136,24 +136,24 @@ The table below resume the combined use of these options and the result:
 ### Write next version in the configuration file (pom.xml, package.json)
 The optional parameter `writeVersion` allow writing back to the file the next calculated version.
 
-**:warning: For some configurations files, the CLI is needed (maven fo example). :warning:** 
+**:warning: For some configurations files, the CLI is needed (maven fo example). :warning:**
 
-The supported configurations files : 
+The supported configurations files :
  - pom.xml (Maven) : need the Maven CLI in the path,
  - package.json (NPM) : need the Npm CLI in the path,
  - chart.yaml (Helm),
  - build.gradle / gradle.properties (Gradle).
 
 Example of use :
-With a project with a package.json as follows : 
+With a project with a package.json as follows :
 ```json
 {
   "name": "conventional-commits-plugin-example-npm",
   "version": "1.0.0",
   "description": "Npm example project"
 }
-``` 
-The following pipeline with a commit with a commit message like _feat: my cool feature_: 
+```
+The following pipeline with a commit with a commit message like _feat: my cool feature_:
 ```groovy
 pipeline {
     agent any
@@ -169,24 +169,22 @@ pipeline {
     }
 }
 ```
-Will update the _package.json_ as follow : 
+Will update the _package.json_ as follow :
 ```json
 {
   "name": "conventional-commits-plugin-example-npm",
   "version": "1.1.0",
   "description": "Npm example project"
 }
-``` 
+```
 
 ## Issues
 
-Report issues and enhancements in the [Github issue tracker](https://github.com/jenkinsci/conventional-commits/issues).
+Report issues and enhancements in the [Github issue tracker](https://github.com/jenkinsci/conventional-commits-plugin/issues).
 
 ## Contributing
 
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
-
-Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
+We encourage community contributions for this project! For more information on how to contribute to this project, see [the contribution guidelines](./.github/CONTRIBUTING.md)
 
 ## LICENSE
 
