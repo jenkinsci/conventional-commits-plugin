@@ -81,6 +81,16 @@ public class PythonProjectType extends ProjectType {
     return Version.valueOf(result);
   }
 
+  /**
+   * Check if there is a Python config file in the directory (setup.py, setup.cfg, pyproject.toml)
+   * If it's the case, change the file with next version wanted.
+   *
+   * @param directory The directory where write the file.
+   * @param nextVersion The next version to use.
+   * @param processHelper The helper to run the command (not used here).
+   * @throws IOException If errors occurs when write the file
+   * @throws InterruptedException If errors occurs with a pyhton command (not used here).
+   */
   @Override
   public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
       throws IOException, InterruptedException {
@@ -115,6 +125,15 @@ public class PythonProjectType extends ProjectType {
     }
   }
 
+  /**
+   * Write an updated temporary file with next version
+   * then replace the project config file with it.
+   *
+   * @param buildPath Path of the file updated
+   * @param buildTempPath Path of a temporary file to replace buildPath
+   * @param nextVersion Version to update config file
+   * @throws IOException If errors occurs when write the file
+   */
   private void createNewUpdateFile(String buildPath, String buildTempPath, Version nextVersion)
           throws IOException {
     // Line to read
@@ -130,9 +149,7 @@ public class PythonProjectType extends ProjectType {
 
         while ((line = reader.readLine()) != null) {
           if (!isVersionTag & (line.toLowerCase().startsWith("version ")
-                  || line.toLowerCase().startsWith("version")
-                  || line.toLowerCase().startsWith("version:")
-                  || line.toLowerCase().startsWith("version :"))) {
+                  || line.toLowerCase().startsWith("version"))) {
             String[] words = line.split("=");
             currentVersion = words[1].trim();
             if (currentVersion.contains("\"")) {
