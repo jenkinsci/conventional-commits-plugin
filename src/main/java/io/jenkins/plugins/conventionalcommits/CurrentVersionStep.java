@@ -96,7 +96,7 @@ public class CurrentVersionStep extends Step {
 
     @Override
     public String getDisplayName() {
-      return "Current Version: determine the next version from the conventional commit history";
+      return "Current Version: determine the current version from the conventional commit history";
     }
 
     @Override
