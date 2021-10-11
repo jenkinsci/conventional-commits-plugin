@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    TODO
+    Determine the current or next version from the conventional commit history.
 </div>
