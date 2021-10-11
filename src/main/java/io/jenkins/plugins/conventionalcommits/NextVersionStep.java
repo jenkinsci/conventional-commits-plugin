@@ -1,5 +1,8 @@
 package io.jenkins.plugins.conventionalcommits;
 
+import static io.jenkins.plugins.conventionalcommits.process.ProcessUtil.execute;
+import static io.jenkins.plugins.conventionalcommits.utils.TagsHelper.getLatestTag;
+
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.LineReader;
@@ -47,27 +50,6 @@ public class NextVersionStep extends Step {
   @DataBoundConstructor
   public NextVersionStep() {
     // empty constructor, for now...
-  }
-
-  private static String execute(File dir, String... commandAndArgs)
-      throws IOException, InterruptedException {
-    ProcessBuilder builder = new ProcessBuilder().directory(dir).command(commandAndArgs);
-
-    Process process = builder.start();
-    int exitCode = process.waitFor();
-    if (exitCode != 0) {
-      String stderr = stdout(process.getErrorStream());
-      throw new IOException(
-          "executing '"
-              + String.join(" ", commandAndArgs)
-              + "' failed in '"
-              + dir
-              + "' with exit code"
-              + exitCode
-              + " and error "
-              + stderr);
-    }
-    return stdout(process.getInputStream());
   }
 
   /**
@@ -229,35 +211,6 @@ public class NextVersionStep extends Step {
       this.nonAnnotatedTag = nonAnnotatedTag;
     }
 
-    /**
-     * Return the last tag.
-     *
-     * @param dir The project's directory.
-     * @param includeNonAnnotatedTags If true include the non annotated tag.
-     *
-     * @return The last tag of the project.
-     */
-    private String getLatestTag(File dir, boolean includeNonAnnotatedTags)
-        throws InterruptedException, IOException {
-      Objects.requireNonNull(dir, "Directory is mandatory");
-      String latestTag = "";
-      try {
-        if (includeNonAnnotatedTags) {
-          latestTag = execute(dir, "git", "tag", "-l").trim();
-          latestTag = latestTag.substring(latestTag.lastIndexOf("\n") + 1);
-        } else {
-          latestTag = execute(dir, "git", "describe", "--abbrev=0", "--tags").trim();
-        }
-      } catch (IOException exp) {
-        if (exp.getMessage().contains("No names found, cannot describe anything.")) {
-          getContext().get(TaskListener.class).getLogger().println("No tags found");
-        }
-      }
-
-      getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
-      return latestTag;
-    }
-
     @Override
     protected String run() throws Exception {
       FilePath workspace = getContext().get(FilePath.class);
@@ -270,7 +223,7 @@ public class NextVersionStep extends Step {
         throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
       } else {
         File dir = new File(workspace.getRemote());
-        String latestTag = getLatestTag(dir, nonAnnotatedTag);
+        String latestTag = getLatestTag(getContext(), dir, nonAnnotatedTag);
 
         Version currentVersion =
             new CurrentVersion()

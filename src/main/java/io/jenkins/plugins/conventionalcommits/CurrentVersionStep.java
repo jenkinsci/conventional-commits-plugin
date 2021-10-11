@@ -1,6 +1,7 @@
 package io.jenkins.plugins.conventionalcommits;
 
 import static io.jenkins.plugins.conventionalcommits.NextVersionStep.stdout;
+import static io.jenkins.plugins.conventionalcommits.process.ProcessUtil.execute;
 
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
@@ -9,6 +10,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
+import io.jenkins.plugins.conventionalcommits.utils.TagsHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -29,51 +31,14 @@ import org.kohsuke.stapler.DataBoundSetter;
  */
 public class CurrentVersionStep extends Step {
 
-  private String outputFormat;
-  private String startTag;
-
   @DataBoundConstructor
   public CurrentVersionStep() {
     // empty constructor, for now...
   }
 
-  @DataBoundSetter
-  public void setOutputFormat(String outputFormat) {
-    this.outputFormat = outputFormat;
-  }
-
-  @DataBoundSetter
-  public void setStartTag(String startTag) {
-    this.startTag = startTag;
-  }
-
   @Override
   public StepExecution start(StepContext stepContext) throws Exception {
-    return new Execution(
-        outputFormat,
-        startTag,
-        stepContext);
-  }
-
-  private static String execute(File dir, String... commandAndArgs)
-      throws IOException, InterruptedException {
-    ProcessBuilder builder = new ProcessBuilder().directory(dir).command(commandAndArgs);
-
-    Process process = builder.start();
-    int exitCode = process.waitFor();
-    if (exitCode != 0) {
-      String stderr = stdout(process.getErrorStream());
-      throw new IOException(
-          "executing '"
-              + String.join(" ", commandAndArgs)
-              + "' failed in '"
-              + dir
-              + "' with exit code"
-              + exitCode
-              + " and error "
-              + stderr);
-    }
-    return stdout(process.getInputStream());
+    return new Execution(stepContext);
   }
 
   /**
@@ -84,55 +49,13 @@ public class CurrentVersionStep extends Step {
 
     private static final long serialVersionUID = 1L;
 
-    @SuppressFBWarnings(
-        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
-        justification = "Only used when starting.")
-    private final transient String outputFormat;
-
-    @SuppressFBWarnings(
-        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
-        justification = "Only used when starting.")
-    private final transient String startTag;
-
     /**
      * Constructor with fields initialisation.
      *
-     * @param outputFormat Output format for the next version
-     * @param startTag     Git tag
      * @param context      Jenkins context
      */
-    protected Execution(String outputFormat, String startTag, @Nonnull StepContext context) {
+    protected Execution(@Nonnull StepContext context) {
       super(context);
-      this.outputFormat = outputFormat;
-      this.startTag = startTag;
-    }
-
-    /**
-     * Return the last tag.
-     *
-     * @param dir                     The project's directory.
-     * @param includeNonAnnotatedTags If true include the non annotated tag.
-     * @return The last tag of the project.
-     */
-    private String getLatestTag(File dir, boolean includeNonAnnotatedTags)
-        throws InterruptedException, IOException {
-      Objects.requireNonNull(dir, "Directory is mandatory");
-      String latestTag = "";
-      try {
-        if (includeNonAnnotatedTags) {
-          latestTag = execute(dir, "git", "tag", "-l").trim();
-          latestTag = latestTag.substring(latestTag.lastIndexOf("\n") + 1);
-        } else {
-          latestTag = execute(dir, "git", "describe", "--abbrev=0", "--tags").trim();
-        }
-      } catch (IOException exp) {
-        if (exp.getMessage().contains("No names found, cannot describe anything.")) {
-          getContext().get(TaskListener.class).getLogger().println("No tags found");
-        }
-      }
-
-      getContext().get(TaskListener.class).getLogger().println("Current Tag is: " + latestTag);
-      return latestTag;
     }
 
     /**
@@ -153,13 +76,12 @@ public class CurrentVersionStep extends Step {
         throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
       } else {
         File dir = new File(workspace.getRemote());
-        String latestTag = getLatestTag(dir, false);
+        String latestTag = TagsHelper.getLatestTag(getContext(), dir, false);
 
         Version currentVersion =
             new CurrentVersion()
                 .getCurrentVersion(
                     dir, latestTag, getContext().get(TaskListener.class).getLogger());
-
 
         return currentVersion.toString();
       }
