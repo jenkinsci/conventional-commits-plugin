@@ -12,9 +12,12 @@ public class ProcessUtil {
 
   /**
    * Execute a CLI command using ProcessBuilder.
+   *
    * @param dir Directory where execute the command.
    * @param commandAndArgs Command and parameters of the command.
-   * @return THe otput of the command.
+   *
+   * @return THe output of the command.
+   *
    * @throws IOException If an error occur accessing files.
    * @throws InterruptedException If the command is interrupted.
    */
