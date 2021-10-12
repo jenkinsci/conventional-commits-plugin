@@ -5,6 +5,24 @@
         <f:textbox/>
     </f:entry>
     <f:entry field="startTag" title="${%StartTag}">
-            <f:textbox/>
-        </f:entry>
+        <f:textbox/>
+    </f:entry>
+    <f:entry field="preRelease" title="${%PreRelease}">
+        <f:textbox/>
+    </f:entry>
+    <f:entry field="preservePreRelease" title="${%PreservePreRelease}">
+        <f:checkbox/>
+    </f:entry>
+    <f:entry field="incrementPreRelease" title="${%IncrementPreRelease}">
+        <f:checkbox/>
+    </f:entry>
+    <f:entry field="buildMetadata" title="${%BuildMetadata}">
+        <f:textbox/>
+    </f:entry>
+    <f:entry field="writeVersion" title="${%WriteVersion}">
+        <f:checkbox/>
+    </f:entry>
+    <f:entry field="nonAnnotatedTag" title="${%NonAnnotatedTag}">
+        <f:checkbox/>
+    </f:entry>
 </j:jelly>
