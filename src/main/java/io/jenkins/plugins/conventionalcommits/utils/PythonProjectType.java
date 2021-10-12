@@ -148,8 +148,7 @@ public class PythonProjectType extends ProjectType {
               StandardCharsets.UTF_8)) {
 
         while ((line = reader.readLine()) != null) {
-          if (!isVersionTag & (line.toLowerCase().startsWith("version ")
-                  || line.toLowerCase().startsWith("version"))) {
+          if (!isVersionTag & line.toLowerCase().contains("version")) {
             String[] words = line.split("=");
             currentVersion = words[1].trim();
             if (currentVersion.contains("\"")) {
