@@ -91,9 +91,17 @@ public class NextVersionStep extends Step {
     return builder.toString();
   }
 
+  public String getOutputFormat() {
+    return outputFormat;
+  }
+
   @DataBoundSetter
   public void setOutputFormat(String outputFormat) {
     this.outputFormat = outputFormat;
+  }
+
+  public String getStartTag() {
+    return startTag;
   }
 
   @DataBoundSetter
@@ -101,9 +109,17 @@ public class NextVersionStep extends Step {
     this.startTag = startTag;
   }
 
+  public String getBuildMetadata() {
+    return buildMetadata;
+  }
+
   @DataBoundSetter
   public void setBuildMetadata(String buildMetadata) {
     this.buildMetadata = buildMetadata;
+  }
+
+  public boolean isWriteVersion() {
+    return writeVersion;
   }
 
   @DataBoundSetter
@@ -111,9 +127,17 @@ public class NextVersionStep extends Step {
     this.writeVersion = writeVersion;
   }
 
+  public String getPreRelease() {
+    return preRelease;
+  }
+
   @DataBoundSetter
   public void setPreRelease(String preRelease) {
     this.preRelease = preRelease;
+  }
+
+  public boolean isPreservePreRelease() {
+    return preservePreRelease;
   }
 
   @DataBoundSetter
@@ -121,9 +145,17 @@ public class NextVersionStep extends Step {
     this.preservePreRelease = preservePreRelease;
   }
 
+  public boolean isIncrementPreRelease() {
+    return incrementPreRelease;
+  }
+
   @DataBoundSetter
   public void setIncrementPreRelease(boolean incrementPreRelease) {
     this.incrementPreRelease = incrementPreRelease;
+  }
+
+  public boolean isNonAnnotatedTag() {
+    return nonAnnotatedTag;
   }
 
   @DataBoundSetter
