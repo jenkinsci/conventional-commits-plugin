@@ -1,0 +1,44 @@
+<p>
+    Determine the next release version based on previous tags and the commit messages used.
+    It calculates the version number based on the format of the commit message.
+    The commit message format used is <a href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank">conventional commits.</a>
+</p>
+<p>
+    This plugin can be used in a pipeline in a stage or the environment block. Some examples of this in use are:<br/>
+    <strong>In the environment block:</strong><br/>
+    <code>
+        <pre>
+pipeline {
+    agent any
+
+    environment {
+        NEXT_VERSION = nextVersion()
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+	    </pre>
+    </code>
+    <strong>In a scripted Pipeline:</strong><br/>
+    <code>
+        <pre>
+def NEXT_VERSION
+node {
+    stage('Get next version ...') {
+      NEXT_VERSION=nextVersion()
+      echo "Next version : $NEXT_VERSION"
+    }
+    stage ('Release') {
+        sh "mvn release:prepare -DreleaseVersion=$NEXT_VERSION"
+        sh 'mvn release:perform'
+    }
+}
+	    </pre>
+    </code>
+</p>
