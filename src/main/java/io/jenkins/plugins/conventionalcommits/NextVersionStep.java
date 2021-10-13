@@ -5,7 +5,6 @@ import static io.jenkins.plugins.conventionalcommits.utils.TagsHelper.getLatestT
 
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.LineReader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
@@ -14,12 +13,8 @@ import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
 import io.jenkins.plugins.conventionalcommits.utils.WriteVersion;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +26,9 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-/** Base class of the plugin. */
+/**
+ * Base class of the plugin.
+ */
 public class NextVersionStep extends Step {
 
   private String outputFormat;
@@ -50,27 +47,6 @@ public class NextVersionStep extends Step {
   @DataBoundConstructor
   public NextVersionStep() {
     // empty constructor, for now...
-  }
-
-  /**
-   * Reads data from stdout.
-   *
-   * @param in InputStream object.
-   * @return read data.
-   * @throws IOException If an error occur reading files.
-   */
-  public static String stdout(InputStream in) throws IOException {
-    StringBuilder builder = new StringBuilder();
-    LineReader reader = new LineReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-    while (true) {
-      String line = reader.readLine();
-      if (line == null) {
-        break;
-      }
-      builder.append(line);
-      builder.append(System.getProperty("line.separator"));
-    }
-    return builder.toString();
   }
 
   public String getOutputFormat() {
@@ -159,7 +135,9 @@ public class NextVersionStep extends Step {
         stepContext);
   }
 
-  /** This class extends Step Execution class, contains the run method. */
+  /**
+   * This class extends Step Execution class, contains the run method.
+   */
   public static class Execution extends SynchronousStepExecution<String> {
 
     private static final long serialVersionUID = 1L;
@@ -212,15 +190,15 @@ public class NextVersionStep extends Step {
     /**
      * Constructor with fields initialisation.
      *
-     * @param outputFormat Output format for the next version
-     * @param startTag Git tag
-     * @param buildMetadata Add meta date to the version.
-     * @param writeVersion Should write the new version in the file.
-     * @param preRelease Pre release information to add
-     * @param preservePreRelease Keep existing prerelease information or not
+     * @param outputFormat        Output format for the next version
+     * @param startTag            Git tag
+     * @param buildMetadata       Add meta date to the version.
+     * @param writeVersion        Should write the new version in the file.
+     * @param preRelease          Pre release information to add
+     * @param preservePreRelease  Keep existing prerelease information or not
      * @param incrementPreRelease Increment prerelease information or not
-     * @param nonAnnotatedTag Should use or non annotated tags
-     * @param context Jenkins context
+     * @param nonAnnotatedTag     Should use or non annotated tags
+     * @param context             Jenkins context
      */
     protected Execution(
         String outputFormat,
@@ -315,7 +293,9 @@ public class NextVersionStep extends Step {
     }
   }
 
-  /** This Class implements the abstract class StepDescriptor. */
+  /**
+   * This Class implements the abstract class StepDescriptor.
+   */
   @Extension
   public static class DescriptorImpl extends StepDescriptor {
 

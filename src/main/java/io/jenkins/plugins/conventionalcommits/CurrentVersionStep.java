@@ -1,11 +1,7 @@
 package io.jenkins.plugins.conventionalcommits;
 
-import static io.jenkins.plugins.conventionalcommits.NextVersionStep.stdout;
-import static io.jenkins.plugins.conventionalcommits.process.ProcessUtil.execute;
-
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.TaskListener;
@@ -13,7 +9,6 @@ import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
 import io.jenkins.plugins.conventionalcommits.utils.TagsHelper;
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.jenkinsci.plugins.workflow.steps.Step;
@@ -22,7 +17,6 @@ import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 
 /**
  * Step to get the current version of the project.
@@ -52,7 +46,7 @@ public class CurrentVersionStep extends Step {
     /**
      * Constructor with fields initialisation.
      *
-     * @param context      Jenkins context
+     * @param context Jenkins context
      */
     protected Execution(@Nonnull StepContext context) {
       super(context);
