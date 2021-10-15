@@ -62,7 +62,7 @@ node {
 The plugin provides provision to use optional parameters for support of build metadata, pre-release information, settings the start tag, etc.
 :warning: These parameters are only for the _nextVersion_ step ! :warning: 
 
-### Build Metadata 
+### Build Metadata
 
 `buildMetadata` an optional parameter can be added as follows:
 
