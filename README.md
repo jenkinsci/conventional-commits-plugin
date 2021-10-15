@@ -43,7 +43,7 @@ pipeline {
 
 ```groovy
 def NEXT_VERSION
-node {                                                 
+node {
     stage('Get next version ...') {
       CURRENT_VERSION=currentVersion()
       echo "Current version: $CURRENT_VERSION"  
