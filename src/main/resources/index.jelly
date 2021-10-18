@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    Determine the current or next version from the conventional commit history.
+    Steps to determine next or current version from conventional commits messages or configuration files.
 </div>
