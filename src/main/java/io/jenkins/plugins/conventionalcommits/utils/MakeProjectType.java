@@ -69,7 +69,7 @@ public class MakeProjectType extends ProjectType {
           StandardCharsets.UTF_8)) {
 
         while ((line = reader.readLine()) != null) {
-          if (!isVersionTag & (line.toLowerCase().startsWith("version ") 
+          if (!isVersionTag && (line.toLowerCase().startsWith("version ")
               || line.toLowerCase().startsWith("version")
               || line.toLowerCase().startsWith("version:") 
               || line.toLowerCase().startsWith("version :"))) {

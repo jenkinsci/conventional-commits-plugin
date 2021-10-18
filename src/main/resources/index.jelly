@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    TODO
+    Steps to determine next or current version from conventional commits messages or configuration files.
 </div>

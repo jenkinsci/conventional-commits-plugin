@@ -8,9 +8,10 @@
 
 ## Introduction
 
-This plugin can be used to determine the next release version based on previous tags and the commit messages used.
-:warning: By default only [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging) are supported, to support non annotated tag you must use an option to activate this feature (see below).:warning:
-It calculates the version number based on the format of the commit message.
+This plugin can be used to determine the next release version based on previous tags and the commit messages used.  
+It can also be used to get the current version. 
+:warning: By default only [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging) are supported, to support non annotated tag you must use an option to activate this feature (see below).:warning: 
+It calculates the version number based on the format of the commit message.  
 The commit message format used is [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Getting started
@@ -24,12 +25,14 @@ pipeline {
     agent any
 
     environment {
+        CURRENT_VERSION = currentVersion()
         NEXT_VERSION = nextVersion()
     }
 
     stages {
         stage('Hello') {
             steps {
+                echo "current vesion = ${CURRENT_VERSION}"
                 echo "next version = ${NEXT_VERSION}"
             }
         }
@@ -42,6 +45,8 @@ pipeline {
 def NEXT_VERSION
 node {
     stage('Get next version ...') {
+      CURRENT_VERSION=currentVersion()
+      echo "Current version: $CURRENT_VERSION"  
       NEXT_VERSION=nextVersion()
       echo "Next version : $NEXT_VERSION"
     }
@@ -54,7 +59,8 @@ node {
 
 ## Using Optional Parameters
 
-The plugin provides provision to use optional parameters for support of build metadata, pre-release information, settnig the start tag, etc.
+The plugin provides provision to use optional parameters for support of build metadata, pre-release information, settings the start tag, etc.
+:warning: These parameters are only for the _nextVersion_ step ! :warning: 
 
 ### Build Metadata
 
