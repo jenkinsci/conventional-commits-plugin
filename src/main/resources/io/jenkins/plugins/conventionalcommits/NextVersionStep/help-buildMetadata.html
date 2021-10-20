@@ -1,0 +1,21 @@
+<p>
+    An optional parameter can be added as follows:
+    <code>
+        <pre>
+pipeline {
+    agent any
+    environment {
+        NEXT_VERSION = nextVersion(buildMetadata: "$env.BUILD_NUMBER")
+    }
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+        </pre>
+    </code>
+    Assuming next version is 1.1.0. The pipeline will output: next version = 1.1.0+001
+</p>
