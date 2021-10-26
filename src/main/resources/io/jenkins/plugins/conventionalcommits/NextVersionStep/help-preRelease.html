@@ -1,0 +1,23 @@
+<p>
+    For a <code>1.0.0</code> existing version the following code:
+    <code>
+        <pre>
+pipeline {
+    agent any
+
+    environment {
+        NEXT_VERSION = nextVersion(preRelease: 'alpha')
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        }
+    }
+}
+        </pre>
+    </code>
+    Will display: next version = 1.1.0-alpha
+</p>
