@@ -27,15 +27,17 @@ abstract class ProjectType {
   /**
    * Write an updated temporary file with next version
    * then replace the project config file with it.
-   * Return if a version tag was found.
    *
    * @param buildPath Path of the file updated
    * @param buildTempPath Path of a temporary file to replace buildPath
    * @param nextVersion Version to update config file
+   * @param isIndented Can the config file have indentation
+   * @param matchingWords Tab of word to match the version
+   * @return if a version tag was found
    * @throws IOException If errors occurs when write the file
    */
   public boolean createNewUpdateFile(String buildPath, String buildTempPath, Version nextVersion,
-                                  boolean isIdented, String[] matchingWords)
+                                  boolean isIndented, String[] matchingWords)
           throws IOException {
     // Line to read
     String line;
@@ -47,10 +49,9 @@ abstract class ProjectType {
     try (BufferedReader reader = Files.newBufferedReader(Paths.get(buildPath))) {
       try (BufferedWriter fw = Files.newBufferedWriter(Paths.get(buildTempPath),
               StandardCharsets.UTF_8)) {
-        Stream<String> streamOfWord = Arrays.stream(matchingWords);
         while ((line = reader.readLine()) != null) {
-          if (!isVersionTag & streamOfWord
-                  .anyMatch(isIdented ? line.toLowerCase()::contains :
+          if (!isVersionTag & Arrays.stream(matchingWords)
+                  .anyMatch(isIndented ? line.toLowerCase()::contains :
                           line.toLowerCase()::startsWith)) {
             String[] words = line.split("=");
             currentVersion = words[1].trim();
