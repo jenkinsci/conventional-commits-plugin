@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 abstract class ProjectType {
 
@@ -50,7 +49,7 @@ abstract class ProjectType {
       try (BufferedWriter fw = Files.newBufferedWriter(Paths.get(buildTempPath),
               StandardCharsets.UTF_8)) {
         while ((line = reader.readLine()) != null) {
-          if (!isVersionTag & Arrays.stream(matchingWords)
+          if (!isVersionTag && Arrays.stream(matchingWords)
                   .anyMatch(isIndented ? line.toLowerCase()::contains :
                           line.toLowerCase()::startsWith)) {
             String[] words = line.split("=");
