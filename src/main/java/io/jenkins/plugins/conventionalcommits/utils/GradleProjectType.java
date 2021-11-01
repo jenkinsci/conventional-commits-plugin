@@ -39,7 +39,7 @@ public class GradleProjectType extends ProjectType {
 
     String[] resultLines = results.split("[\\r\\n]+");
     for (String line : resultLines) {
-      if (line.startsWith("version:")) {
+      if (line.contains("version:")) {
         String[] words = line.split(" ");
         version = words[1];
         break;
