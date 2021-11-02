@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Represent a python project type. Projects any of the having following files are supported: 1.
@@ -47,11 +48,14 @@ public class PythonProjectType extends ProjectType {
 
     String result = "";
 
+    // 1- Check if a version attribute is in a setup.py
     if (checkSetupPy(directory)) {
       List<String> command = Arrays.asList(commandName, "setup.py", "--version");
-      result = processHelper.runProcessBuilder(directory, command).trim();
-    } else if (checkSetupCfg(directory)) {
+      result = processHelper.runProcessBuilder(directory, command);
+    } 
 
+    // 2- If no version attribute in a setup.py, check in a setup.cfg
+    if (StringUtils.isBlank(result) && checkSetupCfg(directory)) {
       String filePath = directory.getAbsolutePath() + File.separator + "setup.cfg";
       File setupCfg = new File(filePath);
       Scanner scanner = new Scanner(setupCfg, StandardCharsets.UTF_8.name());
@@ -60,20 +64,21 @@ public class PythonProjectType extends ProjectType {
         String line = scanner.nextLine();
         if (line.toLowerCase().contains("version")) {
           String[] words = line.split("=");
-          result = words[1].trim();
+          result = words[1];
           break;
         }
       }
-
-    } else if (checkPyProjectToml(directory)) {
+    } 
+    
+    // 3- If no version attribute in a setup.py or in a setup.cfg check in a pyproject.toml
+    if (StringUtils.isBlank(result) && checkPyProjectToml(directory)) {
       String tomlFilePath = directory.getAbsolutePath() + File.separator + "pyproject.toml";
       result = new PyProjectToml().getVersion(tomlFilePath);
-
-    } else {
+    } else if (StringUtils.isBlank(result)) {
       throw new NotImplementedException("Project not supported");
     }
 
-    return Version.valueOf(result);
+    return Version.valueOf(result.trim());
   }
 
   /**
