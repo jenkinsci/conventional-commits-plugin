@@ -50,8 +50,7 @@ abstract class ProjectType {
               StandardCharsets.UTF_8)) {
         while ((line = reader.readLine()) != null) {
           if (!isVersionTag && Arrays.stream(matchingWords)
-                  .anyMatch(isIndented ? line.toLowerCase()::contains :
-                          line.toLowerCase()::startsWith)) {
+                  .anyMatch(line.toLowerCase()::contains)) {
             String[] words = line.split("=");
             currentVersion = words[1].trim();
             if (currentVersion.contains("\"")) {

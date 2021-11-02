@@ -30,9 +30,7 @@ public class MakeProjectType extends ProjectType {
 
     while (scanner.hasNextLine()) {
       String line = scanner.nextLine();
-      if (line.toLowerCase().startsWith("version ") || line.toLowerCase().startsWith("version")
-          || line.toLowerCase().startsWith("version:") 
-          || line.toLowerCase().startsWith("version :")) {
+      if (line.toLowerCase().contains("version")) {
         String[] words = line.split("=");
         results = words[1].trim();
         break;
