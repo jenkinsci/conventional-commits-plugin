@@ -2,6 +2,8 @@ package io.jenkins.plugins.conventionalcommits.utils;
 
 import com.github.zafarkhaja.semver.Version;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
+import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.core.IsEqual;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -16,6 +18,8 @@ import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PythonProjectTypeTest {
@@ -57,7 +61,7 @@ public class PythonProjectTypeTest {
         String configContent =
                 "[metadata]\n"+
                         "name = myName\n" +
-                        "version = " + version + "\n"+
+                        (StringUtils.isNotBlank(version) ? "version = " + version + "\n" : "")+
                         "author = EG";
         FileWriter pyWriter = new FileWriter(pyCfg);
         pyWriter.write(configContent);
@@ -85,7 +89,7 @@ public class PythonProjectTypeTest {
                 "[project]\n"+
                         "name = \"infer_pyproject\"\n" +
                         "version = \"" + version + "\"\n"+
-                        "author = EG";
+                        "author = [\"EG<foo@foo.com>\"]";
         FileWriter pyWriter = new FileWriter(pyCfg);
         pyWriter.write(configContent);
         pyWriter.close();
@@ -103,6 +107,82 @@ public class PythonProjectTypeTest {
         pyWriter.write(configContent);
         pyWriter.close();
     }
+
+
+    @Test
+    public void shouldGetCurrentVersionForASetupPy() throws Exception {
+        // Given a Python project with a setup.py
+        File pyDir = rootFolder.newFolder("SamplePyProject");
+        createSetupPy(pyDir, "0.9.0");
+        when(mockProcessHelper.runProcessBuilder(any(), any())).thenReturn("0.9.0");
+        
+        // Asking to have the current version of the project
+        PythonProjectType pyProjectType = new PythonProjectType();
+        Version readVersion = pyProjectType.getCurrentVersion(pyDir, mockProcessHelper);
+
+        // The current version is returned
+        assertThat(readVersion, IsEqual.equalTo(Version.valueOf("0.9.0")));
+    }
+
+    @Test
+    public void shouldGetCurrentVersionForASetupCfg() throws Exception {
+        // Given a Python project with a setup.cfg
+        File pyDir = rootFolder.newFolder("SamplePyProject");
+        createPythonCfg(pyDir, "0.9.0");
+        
+        // Asking to have the current version of the project
+        PythonProjectType pyProjectType = new PythonProjectType();
+        Version readVersion = pyProjectType.getCurrentVersion(pyDir, mockProcessHelper);
+
+        // The current version is returned
+        assertThat(readVersion, IsEqual.equalTo(Version.valueOf("0.9.0")));
+    }
+
+    @Test
+    public void shouldGetCurrentVersionForASetupToml() throws Exception {
+        // Given a Python project with a pyproject.toml
+        File pyDir = rootFolder.newFolder("SamplePyProject");
+        createTomlPy(pyDir, "0.9.0");
+        
+        // Asking to have the current version of the project
+        PythonProjectType pyProjectType = new PythonProjectType();
+        Version readVersion = pyProjectType.getCurrentVersion(pyDir, mockProcessHelper);
+
+        // The current version is returned
+        assertThat(readVersion, IsEqual.equalTo(Version.valueOf("0.9.0")));
+    }
+    
+    @Test
+    public void shouldGetCurrentVersionWithSeveralConfigFilesWithEmptyValues() throws Exception {
+        // Given a Python project with a pyproject.toml (with version) and a setup.py (without version)
+        File pyDir = rootFolder.newFolder("SamplePyProject");
+        createTomlPy(pyDir, "0.9.0");
+        createSetupPy(pyDir, null);
+
+        // Asking to have the current version of the project
+        PythonProjectType pyProjectType = new PythonProjectType();
+        Version readVersion = pyProjectType.getCurrentVersion(pyDir, mockProcessHelper);
+
+        // The current version is returned
+        assertThat(readVersion, IsEqual.equalTo(Version.valueOf("0.9.0")));
+    }
+
+    @Test
+    public void shouldGetCurrentVersionWithSeveralConfigFilesFirstConfigFileMatche() throws Exception {
+        // Given a Python project with a pyproject.toml (with version) and a setup.py (without version)
+        File pyDir = rootFolder.newFolder("SamplePyProject");
+        createTomlPy(pyDir, "0.9.0");
+        createSetupPy(pyDir, "0.8.0");
+        when(mockProcessHelper.runProcessBuilder(any(), any())).thenReturn("0.8.0");
+
+        // Asking to have the current version of the project
+        PythonProjectType pyProjectType = new PythonProjectType();
+        Version readVersion = pyProjectType.getCurrentVersion(pyDir, mockProcessHelper);
+
+        // The current version is returned
+        assertThat(readVersion, IsEqual.equalTo(Version.valueOf("0.8.0")));
+    }
+
 
     @Test
     public void shouldWriteVersionBack() throws Exception {
