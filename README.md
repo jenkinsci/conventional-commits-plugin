@@ -142,7 +142,9 @@ The supported configurations files :
  - pom.xml (Maven) : need the Maven CLI in the path,
  - package.json (NPM) : need the Npm CLI in the path,
  - chart.yaml (Helm),
- - build.gradle / gradle.properties (Gradle).
+ - build.gradle / gradle.properties (Gradle),
+ - setup.py / setup.cfg / pyproject.toml (Python),
+ - go.mod (GoLang).
 
 Example of use :
 With a project with a package.json as follows :
@@ -169,7 +171,7 @@ pipeline {
     }
 }
 ```
-Will update the _package.json_ as follow :
+Will update the _package.json_ as follows :
 ```json
 {
   "name": "conventional-commits-plugin-example-npm",

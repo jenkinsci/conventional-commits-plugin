@@ -16,6 +16,7 @@ public class ProjectTypeFactory {
     projectTypeMap.put("npm", new NpmProjectType());
     projectTypeMap.put("python", new PythonProjectType());
     projectTypeMap.put("helm", new HelmProjectType());
+    projectTypeMap.put("go", new GoProjectType());
   }
 
   /**

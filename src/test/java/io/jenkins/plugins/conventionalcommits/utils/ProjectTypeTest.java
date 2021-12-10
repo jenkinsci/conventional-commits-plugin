@@ -122,4 +122,19 @@ public class ProjectTypeTest {
     ProjectType projectType = new PythonProjectType();
     assertTrue(projectType.check(pyDir));
   }
+
+  @Test
+  public void isGoProject() throws IOException {
+    File goDir = rootFolder.newFolder("SampleGoProject");
+    rootFolder.newFile(goDir.getName() + File.separator + "go.mod");
+    ProjectType projectType = new GoProjectType();
+    assertEquals(true, projectType.check(goDir));
+  }
+
+  @Test
+  public void isNotGoProject() throws IOException {
+    File goDir = rootFolder.newFolder("SampleGoProject");
+    ProjectType projectType = new GoProjectType();
+    assertFalse(projectType.check(goDir));
+  }
 }
