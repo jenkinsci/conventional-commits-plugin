@@ -12,7 +12,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
-        <jenkins.version>2.249.1</jenkins.version>
+        <jenkins.version>2.324</jenkins.version>
         <java.level>8</java.level>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <checkstyle.config.location>google_checks.xml</checkstyle.config.location>
@@ -79,6 +79,12 @@
           <artifactId>pipeline-utility-steps</artifactId>
           <version>2.11.0</version>
           <scope>test</scope>
+          <exclusions>
+            <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+            </exclusion>
+        </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
