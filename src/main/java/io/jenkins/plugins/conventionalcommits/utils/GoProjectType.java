@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.NotImplementedException;
@@ -49,7 +50,7 @@ public class GoProjectType extends ProjectType {
     String result = "";
 
     // Compiles the regex to create desired version pattern for finding the current version
-    String versionRegex = "^v[0-9]+.[0-9]+.[0-9]+(-((\\balpha\\b)|(\\bbeta\\b)).[0-9])?$";
+    String versionRegex = "v[0-9]+.[0-9]+.[0-9]+(-((\\balpha\\b)|(\\bbeta\\b)).[0-9])?";
     Pattern pattern = Pattern.compile(versionRegex);
 
     if (checkGoMod(directory)) {
@@ -82,7 +83,9 @@ public class GoProjectType extends ProjectType {
   public void writeVersion(File directory, Version nextVersion, ProcessHelper processHelper)
       throws IOException, InterruptedException, NotImplementedException {
     if (checkGoMod(directory)) {
-      System.out.println("The go.mod file already exists");
+      String message = "The go.mod file already exists";
+      LogUtils logger = new LogUtils();
+      logger.log(Level.INFO, Level.INFO, Level.FINE, Level.FINE, true, message);
     } else {
       throw new NotImplementedException("Project not supported");
     }

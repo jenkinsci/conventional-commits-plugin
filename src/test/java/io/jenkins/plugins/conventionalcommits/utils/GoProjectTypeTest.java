@@ -49,7 +49,12 @@ public class GoProjectTypeTest {
     // Given a Go project with a go.mod
     File goDir = rootFolder.newFolder("SampleGoProject");
     createGoMod(goDir);
-    when(mockProcessHelper.runProcessBuilder(any(), any())).thenReturn("v0.1.4");
+    when(mockProcessHelper.runProcessBuilder(any(), any())).thenReturn("go list -m: " +
+        "loading module retractions for github.com/krisstern/hey@v0.1.0: " +
+        "verifying go.mod: github.com/krisstern/hey@v0.1.4/go.mod: " +
+        "initializing sumdb.Client: " +
+        "open /opt/homebrew/bin/go/pkg/sumdb/sum.golang.org/latest: " +
+        "not a directory");
 
     // Asking to have the current version of the project
     GoProjectType goProjectType = new GoProjectType();
