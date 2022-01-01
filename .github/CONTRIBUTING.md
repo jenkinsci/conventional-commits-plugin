@@ -12,7 +12,7 @@ Before you begin, check out our [Developer Guidelines](https://www.jenkins.io/do
 
 ### Issues
 
-#### Create a new Issue
+#### Create a New Issue
 
 If you spot an issue with this project, [search if an issue already exists](https://github.com/jenkinsci/conventional-commits-plugin/issues). If a related issue doesn't exist, you can open new issue using a relevant [issue form](https://github.com/jenkinsci/conventional-commits-plugin/issues/new/choose).
 
@@ -20,13 +20,22 @@ If you spot an issue with this project, [search if an issue already exists](http
 
 Go through our existing issues to find one that interests you. You could also use `labels` as filters, to find the best issue for you.
 
+### Run the plugin
+
+To run the plugin, use the following command, as described in the [official documentation](https://www.jenkins.io/doc/developer/tutorial/run/) on running a plugin:
+```shell
+mvn hpi:run
+```
+
+For this to be successful, please make sure Jenkins is already installed but not already running. The default URL where Jenkins is set up in the browser is [http://localhost:8080/jenkins/](http://localhost:8080/jenkins/), where Jenkins can be accessed once up and running. 
+
 ### Make Changes
 
 #### Fork the Project
 
 Fork this project on GitHub and check out your copy of the repository, to get started making the contribution.
 
-```
+```shell
 git clone https://github.com/contributor/conventional-commits-plugin.git
 cd conventional-commits-plugin
 git remote add upstream conventional-commits-plugin
@@ -36,7 +45,7 @@ git remote add upstream conventional-commits-plugin
 
 Make sure that your fork is up-to-date and create a topic branch for your feature or bug fix.
 
-```
+```shell
 git checkout master
 git pull upstream master
 git checkout -b feature-branch
@@ -50,13 +59,19 @@ Build and run tests with mvn, make sure it outputs BUILD SUCCESS.
 
 Make sure to write a test that reproduces the problem you're trying to fix or describes a feature that you want to build.
 
+Do take note to run the plugin tests with the following command:
+```shell
+mvn test
+```
+Be sure all the tests have been passed before submitting a PR for review. For more information about Jenkins testing in general, please checkout the [official documentation](https://www.jenkins.io/doc/developer/testing/) on testing. 
+
 (*We don't accept pull requests without tests.*)
 
 #### Commit Changes
 
 First, make sure that git knows your name and email address.
 
-```
+```shell
 git config --global user.name "Your Name"
 git config --global user.email "contributor@example.com"
 ```
@@ -65,7 +80,7 @@ Once you are done writing the code, you could now make your [commits](https://gi
 
 Writing good commit messages is important. A commit message should exactly describe what was changed and why.
 
-```
+```shell
 git add ...
 git commit
 ```
@@ -74,7 +89,7 @@ git commit
 
 Once you're done making your commits, you can now push your code.
 
-```
+```shell
 git push origin feature-branch
 ```
 
@@ -96,7 +111,7 @@ While naming your Pull Request, make sure to start the title as follows:
 
 If you've been working on a change for a while, it is very likely that some other changes are already made in the repository. To solve this problem, [rebase](https://docs.github.com/en/get-started/using-git/about-git-rebase) with *upstream/master*.
 
-```
+```shell
 git fetch upstream
 git rebase upstream/master
 git push origin my-feature-branch -f
