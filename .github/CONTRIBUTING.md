@@ -27,7 +27,7 @@ To run the plugin, use the following command, as described in the [official docu
 mvn hpi:run
 ```
 
-For this to be successful, please make sure Jenkins is already installed but not already running. The default URL where Jenkins is set up in the browser is [http://localhost:8080/jenkins/](http://localhost:8080/jenkins/), where Jenkins can be accessed once up and running. 
+For this to be successful, please make sure to either have Jenkins installed, or a docker image of Jenkins is available so that an instance is ready for launch for the testing. The default URL where Jenkins is set up in the browser is [http://localhost:8080/jenkins/](http://localhost:8080/jenkins/), where Jenkins can be accessed once up and running. 
 
 ### Make Changes
 
