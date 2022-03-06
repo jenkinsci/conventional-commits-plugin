@@ -137,4 +137,19 @@ public class ProjectTypeTest {
     ProjectType projectType = new GoProjectType();
     assertFalse(projectType.check(goDir));
   }
+
+  @Test
+  public void isPhpProject() throws IOException {
+    File PhpDir = rootFolder.newFolder("SamplePhpProject");
+    rootFolder.newFile(PhpDir.getName() + File.separator + "composer.json");
+    ProjectType projectType = new PhpProjectType();
+    assertEquals(true, projectType.check(PhpDir));
+  }
+
+  @Test
+  public void isNotPhpProject() throws IOException {
+    File PhpDir = rootFolder.newFolder("SamplePhpProject");
+    ProjectType projectType = new PhpProjectType();
+    assertFalse(projectType.check(PhpDir));
+  }
 }

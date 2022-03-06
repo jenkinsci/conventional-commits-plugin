@@ -68,8 +68,8 @@ public class GoProjectType extends ProjectType {
   }
 
   /**
-   * Check if there is a Go config file (go.mod) file in the directory.
-   * If that's the case change the file will remain the same.
+   * Checks if there is a Go config file (go.mod) file in the directory.
+   * If that's the case then the file will remain the same.
    * This is because for Go modules the release version is from GitHub repository tags.
    *
    * @param directory The directory to which the file is written.

@@ -17,6 +17,7 @@ public class ProjectTypeFactory {
     projectTypeMap.put("python", new PythonProjectType());
     projectTypeMap.put("helm", new HelmProjectType());
     projectTypeMap.put("go", new GoProjectType());
+    projectTypeMap.put("php", new PhpProjectType());
   }
 
   /**
