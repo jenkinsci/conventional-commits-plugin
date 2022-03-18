@@ -1,26 +1,25 @@
 package io.jenkins.plugins.conventionalcommits;
 
-import com.github.zafarkhaja.semver.Version;
-import com.google.common.collect.ImmutableSet;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.model.TaskListener;
-import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
-import io.jenkins.plugins.conventionalcommits.utils.TagsHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import com.github.zafarkhaja.semver.Version;
+import com.google.common.collect.ImmutableSet;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.model.TaskListener;
+import io.jenkins.plugins.conventionalcommits.utils.CurrentVersion;
+import io.jenkins.plugins.conventionalcommits.utils.TagsHelper;
 
 /**
- * Step to get the current version of the project.
- * Example :
+ * Step to get the current version of the project. Example :
  * <code>def CURRENT_VERSION = currentVersion()</code>
  */
 public class CurrentVersionStep extends Step {
@@ -36,8 +35,8 @@ public class CurrentVersionStep extends Step {
   }
 
   /**
-   * This class extends Step Execution class, contains the run method.
-   * This is the main entry point of the step.
+   * This class extends Step Execution class, contains the run method. This is the main entry point
+   * of the step.
    */
   public static class Execution extends SynchronousStepExecution<String> {
 
@@ -66,19 +65,13 @@ public class CurrentVersionStep extends Step {
       }
 
       // if the workspace is remote then lets make a local copy
-      if (workspace.isRemote()) {
-        throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
-      } else {
-        File dir = new File(workspace.getRemote());
-        String latestTag = TagsHelper.getLatestTag(getContext(), dir, false);
+      File dir = new File(workspace.getRemote());
+      String latestTag = TagsHelper.getLatestTag(getContext(), dir, false);
 
-        Version currentVersion =
-            new CurrentVersion()
-                .getCurrentVersion(
-                    dir, latestTag, getContext().get(TaskListener.class).getLogger());
+      Version currentVersion = new CurrentVersion().getCurrentVersion(dir, latestTag,
+          getContext().get(TaskListener.class).getLogger());
 
-        return currentVersion.toString();
-      }
+      return currentVersion.toString();
     }
   }
 
