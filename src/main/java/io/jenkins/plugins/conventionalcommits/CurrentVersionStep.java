@@ -19,8 +19,7 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * Step to get the current version of the project.
- * Example :
+ * Step to get the current version of the project. Example :
  * <code>def CURRENT_VERSION = currentVersion()</code>
  */
 public class CurrentVersionStep extends Step {
@@ -36,8 +35,8 @@ public class CurrentVersionStep extends Step {
   }
 
   /**
-   * This class extends Step Execution class, contains the run method.
-   * This is the main entry point of the step.
+   * This class extends Step Execution class, contains the run method. This is the main entry point
+   * of the step.
    */
   public static class Execution extends SynchronousStepExecution<String> {
 
@@ -66,19 +65,13 @@ public class CurrentVersionStep extends Step {
       }
 
       // if the workspace is remote then lets make a local copy
-      if (workspace.isRemote()) {
-        throw new IOException("workspace.isRemote(), not entirely sure what to do here...");
-      } else {
-        File dir = new File(workspace.getRemote());
-        String latestTag = TagsHelper.getLatestTag(getContext(), dir, false);
+      File dir = new File(workspace.getRemote());
+      String latestTag = TagsHelper.getLatestTag(getContext(), dir, false);
 
-        Version currentVersion =
-            new CurrentVersion()
-                .getCurrentVersion(
-                    dir, latestTag, getContext().get(TaskListener.class).getLogger());
+      Version currentVersion = new CurrentVersion().getCurrentVersion(dir, latestTag,
+          getContext().get(TaskListener.class).getLogger());
 
-        return currentVersion.toString();
-      }
+      return currentVersion.toString();
     }
   }
 
