@@ -29,7 +29,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Wait for build to succeed
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         id: wait-for-build
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,7 +44,7 @@ jobs:
           mvn --no-transfer-progress versions:set -DnewVersion=${{ steps.nextversion.outputs.version }}
 
       - name: Release Drafter
-        uses: release-drafter/release-drafter@v5.21.0
+        uses: release-drafter/release-drafter@v5.21.1
         if: steps.wait-for-build.outputs.conclusion == 'success'
         with:
           name: next
