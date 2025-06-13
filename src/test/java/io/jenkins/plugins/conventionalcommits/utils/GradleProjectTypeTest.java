@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.github.zafarkhaja.semver.Version;
-import io.jenkins.plugins.conventionalcommits.process.DefaultProcessHelper;
 import io.jenkins.plugins.conventionalcommits.process.ProcessHelper;
 import java.io.File;
 import java.io.FileWriter;
